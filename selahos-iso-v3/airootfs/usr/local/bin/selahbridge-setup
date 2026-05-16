@@ -9,11 +9,23 @@ import sys
 import os
 import subprocess
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QProgressBar, QTextEdit, QFrame
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from PyQt6.QtGui import QFont, QColor
+from PyQt6.QtGui import QFont, QColor, QIcon, QPixmap
+
+_ICON_PATHS = [
+    "/usr/share/icons/hicolor/256x256/apps/selahbridge.png",
+    "/usr/local/share/icons/selahbridge.png",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "selahbridge.png"),
+]
+
+def _find_icon():
+    for p in _ICON_PATHS:
+        if os.path.isfile(p):
+            return p
+    return None
 
 COLORS = {
     'bg':    '#0B0F1A',
@@ -280,7 +292,10 @@ class SelahBridgeSetup(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SelahBridge Setup")
-        self.setFixedSize(700, 560)
+        self.setFixedSize(700, 580)
+        icon_path = _find_icon()
+        if icon_path:
+            self.setWindowIcon(QIcon(icon_path))
         self._build()
         self._center()
 
@@ -298,16 +313,33 @@ class SelahBridgeSetup(QMainWindow):
         layout.setContentsMargins(48, 40, 48, 40)
         layout.setSpacing(20)
 
-        # Header
+        # Header: icon + title
+        header = QHBoxLayout()
+        header.setSpacing(16)
+        icon_path = _find_icon()
+        if icon_path:
+            px = QPixmap(icon_path).scaled(
+                56, 56,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            ico = QLabel()
+            ico.setPixmap(px)
+            ico.setFixedSize(56, 56)
+            header.addWidget(ico)
+        title_col = QVBoxLayout()
+        title_col.setSpacing(2)
         title = QLabel("SelahBridge™")
-        title.setFont(QFont('Noto Sans', 28, QFont.Weight.Light))
+        title.setFont(QFont('Noto Sans', 24, QFont.Weight.Light))
         title.setStyleSheet(f"color: {COLORS['gold']};")
-        layout.addWidget(title)
-
+        title_col.addWidget(title)
         subtitle = QLabel("Windows application compatibility for SelahOS")
-        subtitle.setFont(QFont('Noto Sans', 13))
+        subtitle.setFont(QFont('Noto Sans', 11))
         subtitle.setStyleSheet(f"color: {COLORS['muted']};")
-        layout.addWidget(subtitle)
+        title_col.addWidget(subtitle)
+        header.addLayout(title_col)
+        header.addStretch()
+        layout.addLayout(header)
 
         # Divider
         div = QFrame()
