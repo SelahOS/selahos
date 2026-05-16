@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SelahBridge Uninstaller
+Comment=Remove Windows compatibility layer
+Exec=pkexec /usr/local/bin/selahbridge-uninstaller
+Icon=wine
+Terminal=false
+Categories=AudioVideo;Audio;System;

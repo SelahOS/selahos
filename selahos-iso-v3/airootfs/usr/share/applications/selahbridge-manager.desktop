@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SelahBridge Manager
+Comment=Manage Wine settings, apps, audio, and snapshots
+Exec=pkexec /usr/local/bin/selahbridge-manager
+Icon=wine
+Terminal=false
+Categories=AudioVideo;Audio;System;

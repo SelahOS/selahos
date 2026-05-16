@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# SelahOS Installer — launches the SelahOS graphical installer
+exec /usr/local/bin/selahos-installer-launcher

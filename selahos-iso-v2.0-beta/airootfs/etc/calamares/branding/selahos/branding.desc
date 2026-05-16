@@ -1,0 +1,35 @@
+---
+componentName:  selahos
+
+welcomeStyleCalamares: true
+welcomeExpandingLogo:   true
+windowExpanding:        normal
+windowSize:             900px,640px
+windowPlacement:        center
+
+strings:
+    productName:         SelahOS
+    shortProductName:    SelahOS
+    version:             1.0.0-beta
+    shortVersion:        Beta
+    versionedName:       SelahOS v1.0-beta
+    shortVersionedName:  SelahOS Beta
+    bootloaderEntryName: SelahOS
+    productUrl:          https://selahos.io
+    supportUrl:          https://selahos.io/support
+    knownIssuesUrl:      https://github.com/SelahTechnologies/selahos/issues
+    releaseNotesUrl:     https://selahos.io/releases/v1.0-beta
+    donateUrl:           https://selahos.io/founder-license
+
+images:
+    productLogo:         logo.png
+    productIcon:         logo.png
+    productWelcome:      welcome.png
+
+slideshow:               show.qml
+
+style:
+   sidebarBackground:    "#0B0F1A"
+   sidebarText:          "#F1E8D8"
+   sidebarTextSelect:    "#D6A85A"
+   sidebarTextHighlight: "#E6C27A"

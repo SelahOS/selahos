@@ -1,0 +1,418 @@
+#!/usr/bin/env python3
+# ============================================================
+# SelahBridge Setup — One-click installer
+# Launched from the SelahOS utilities menu or desktop shortcut
+# Copyright (C) 2026 Selah Technologies LLC
+# ============================================================
+
+import sys
+import os
+import subprocess
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QLabel, QPushButton, QProgressBar, QTextEdit, QFrame
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QFont, QColor
+
+COLORS = {
+    'bg':    '#0B0F1A',
+    'bg2':   '#111827',
+    'gold':  '#D6A85A',
+    'parch': '#EDE4D4',
+    'muted': '#9A8D7B',
+    'teal':  '#8EC3B8',
+    'red':   '#B97A6F',
+    'border':'#2A3042',
+}
+
+STYLESHEET = f"""
+QMainWindow, QWidget {{
+    background-color: {COLORS['bg']};
+    color: {COLORS['parch']};
+    font-family: 'Noto Sans', sans-serif;
+}}
+QLabel {{ background: transparent; color: {COLORS['parch']}; }}
+QPushButton {{
+    background-color: {COLORS['gold']};
+    color: {COLORS['bg']};
+    border: none;
+    border-radius: 4px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: bold;
+}}
+QPushButton:hover {{ background-color: #E6C27A; }}
+QPushButton:disabled {{
+    background-color: {COLORS['border']};
+    color: {COLORS['muted']};
+}}
+QProgressBar {{
+    background-color: {COLORS['bg2']};
+    border: none;
+    border-radius: 3px;
+    height: 6px;
+}}
+QProgressBar::chunk {{
+    background-color: {COLORS['gold']};
+    border-radius: 3px;
+}}
+QTextEdit {{
+    background-color: {COLORS['bg2']};
+    color: {COLORS['muted']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px;
+}}
+"""
+
+STEPS = [
+    (5,  "Checking system requirements..."),
+    (10, "Enabling multilib repository..."),
+    (20, "Adding Chaotic-AUR..."),
+    (30, "Syncing package databases..."),
+    (40, "Installing Wine Staging..."),
+    (55, "Installing DXVK (DirectX → Vulkan)..."),
+    (65, "Installing WineASIO (Windows audio bridge)..."),
+    (75, "Installing 32-bit libraries..."),
+    (82, "Configuring audio (PipeWire JACK)..."),
+    (88, "Adding user to audio groups..."),
+    (92, "Initializing Wine prefix..."),
+    (96, "Registering WineASIO..."),
+    (100,"SelahBridge ready."),
+]
+
+
+class InstallWorker(QThread):
+    progress = pyqtSignal(int, str)
+    log_line = pyqtSignal(str)
+    finished = pyqtSignal(bool, str)
+
+    def run(self):
+        try:
+            self._install()
+        except Exception as e:
+            self.finished.emit(False, str(e))
+
+    def _run_cmd(self, cmd, desc, pct, env=None):
+        self.progress.emit(pct, desc)
+        self.log_line.emit(f"$ {cmd if isinstance(cmd, str) else ' '.join(cmd)}")
+        result = subprocess.run(
+            cmd,
+            shell=isinstance(cmd, str),
+            capture_output=True,
+            text=True,
+            env={**os.environ, **(env or {})}
+        )
+        if result.stdout:
+            for line in result.stdout.splitlines()[-5:]:
+                self.log_line.emit(line)
+        if result.returncode != 0 and result.stderr:
+            self.log_line.emit(f"⚠ {result.stderr.splitlines()[-1]}")
+        return result.returncode
+
+    def _install(self):
+        # Step 1 — Check requirements
+        self.progress.emit(5, "Checking system requirements...")
+        self.log_line.emit("Checking for Arch Linux base...")
+
+        # Step 2 — Enable multilib
+        self.progress.emit(10, "Enabling multilib repository...")
+        pacman_conf = open('/etc/pacman.conf').read()
+        if '[multilib]' not in pacman_conf or '#[multilib]' in pacman_conf:
+            conf = pacman_conf.replace('#[multilib]', '[multilib]')
+            conf = conf.replace(
+                '#Include = /etc/pacman.d/mirrorlist\n',
+                'Include = /etc/pacman.d/mirrorlist\n',
+                1
+            )
+            with open('/etc/pacman.conf', 'w') as f:
+                f.write(conf)
+            self.log_line.emit("✓ multilib enabled")
+        else:
+            self.log_line.emit("✓ multilib already enabled")
+
+        # Step 3 — Chaotic-AUR
+        self.progress.emit(20, "Adding Chaotic-AUR...")
+        if 'chaotic-aur' not in open('/etc/pacman.conf').read():
+            cmds = [
+                "pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com",
+                "pacman-key --lsign-key 3056513887B78AEB",
+                "pacman -U --noconfirm https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst",
+            ]
+            for cmd in cmds:
+                self._run_cmd(cmd, "Adding Chaotic-AUR...", 20)
+            with open('/etc/pacman.conf', 'a') as f:
+                f.write('\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n')
+            self.log_line.emit("✓ Chaotic-AUR added")
+        else:
+            self.log_line.emit("✓ Chaotic-AUR already configured")
+
+        # Step 4 — Sync
+        self._run_cmd("pacman -Sy --noconfirm", "Syncing package databases...", 30)
+
+        # Step 5 — Wine Staging
+        rc = self._run_cmd(
+            "pacman -S --noconfirm --needed wine-staging wine-mono wine-gecko winetricks",
+            "Installing Wine Staging...", 40
+        )
+        if rc != 0:
+            self.finished.emit(False, "Wine installation failed. Check your internet connection.")
+            return
+
+        # Step 6 — DXVK
+        rc = self._run_cmd(
+            "pacman -S --noconfirm --needed dxvk-async-git",
+            "Installing DXVK...", 55
+        )
+        if rc != 0:
+            # Fall back to stable dxvk
+            self._run_cmd(
+                "pacman -S --noconfirm --needed dxvk",
+                "Installing DXVK (stable)...", 55
+            )
+
+        # Step 7 — WineASIO
+        self._run_cmd(
+            "pacman -S --noconfirm --needed wineasio",
+            "Installing WineASIO...", 65
+        )
+
+        # Step 8 — 32-bit libraries
+        self._run_cmd(
+            "pacman -S --noconfirm --needed "
+            "lib32-vulkan-icd-loader lib32-vulkan-intel "
+            "lib32-libpulse lib32-alsa-lib lib32-alsa-plugins "
+            "lib32-pipewire-jack lib32-gst-plugins-good "
+            "realtime-privileges",
+            "Installing 32-bit libraries...", 75
+        )
+
+        # Step 9 — PipeWire JACK config
+        self.progress.emit(82, "Configuring audio...")
+        user = os.environ.get('SUDO_USER', os.environ.get('USER', 'dbnoble'))
+        home = f"/home/{user}"
+        os.makedirs(f"{home}/.config/pipewire", exist_ok=True)
+        jack_conf = f"{home}/.config/pipewire/jack.conf"
+        if not os.path.exists(jack_conf):
+            with open(jack_conf, 'w') as f:
+                f.write("""context.properties = {
+    default.clock.rate = 48000
+    default.clock.quantum = 256
+    default.clock.min-quantum = 64
+    default.clock.max-quantum = 8192
+}
+""")
+        self.log_line.emit("✓ PipeWire JACK configured")
+
+        # Step 10 — Groups
+        self.progress.emit(88, "Configuring user groups...")
+        self._run_cmd(
+            f"usermod -aG audio,realtime,input,storage {user}",
+            "Adding to audio groups...", 88
+        )
+
+        # Step 11 — Wine prefix init
+        self.progress.emit(92, "Initializing Wine prefix...")
+        user_env = {**os.environ, 'HOME': home, 'USER': user,
+                    'WINEPREFIX': f'{home}/.wine', 'WINEARCH': 'win64'}
+        subprocess.run(
+            ['sudo', '-u', user, 'wine', 'wineboot', '-i'],
+            capture_output=True, env=user_env, timeout=60
+        )
+        self.log_line.emit("✓ Wine prefix initialized")
+
+        # Step 12 — WineASIO registration
+        self.progress.emit(92, "Registering WineASIO...")
+        subprocess.run(
+            ['sudo', '-u', user, 'wine', 'regsvr32', 'wineasio.dll'],
+            capture_output=True, env=user_env
+        )
+        self.log_line.emit("✓ WineASIO registered")
+
+        # Step 13 — Install Firefox for Windows (browser for app authorization)
+        self.progress.emit(94, "Installing Firefox (Windows browser for app auth)...")
+        self.log_line.emit("Installing Firefox for Windows authorization...")
+        subprocess.run(
+            ['sudo', '-u', user, 'winetricks', '-q', 'firefox'],
+            capture_output=True, env=user_env, timeout=300
+        )
+        self.log_line.emit("✓ Firefox installed (use for inMusic, iLok, and online auth)")
+
+        # Step 14 — Optimal Wine settings
+        self.progress.emit(96, "Applying optimal Wine settings...")
+
+        # Windows 10 mode
+        subprocess.run(['sudo', '-u', user, 'wine', 'reg', 'add',
+            'HKEY_CURRENT_USER\\Software\\Wine',
+            '/v', 'Version', '/t', 'REG_SZ', '/d', 'win10', '/f'],
+            capture_output=True, env=user_env)
+
+        # DPI — 96 DPI standard (prevents tiny/huge UI issues)
+        subprocess.run(['sudo', '-u', user, 'wine', 'reg', 'add',
+            'HKEY_CURRENT_USER\\Control Panel\\Desktop',
+            '/v', 'LogPixels', '/t', 'REG_DWORD', '/d', '96', '/f'],
+            capture_output=True, env=user_env)
+
+        # Set Firefox as default browser for http and https
+        for proto in ['http', 'https']:
+            subprocess.run(['sudo', '-u', user, 'wine', 'reg', 'add',
+                f'HKEY_CURRENT_USER\\Software\\Classes\\{proto}\\shell\\open\\command',
+                '/ve', '/t', 'REG_SZ',
+                '/d', '"C:\\Program Files\\Mozilla Firefox\\firefox.exe" "%1"',
+                '/f'], capture_output=True, env=user_env)
+
+        # Disable Edge (prevents it from intercepting browser calls)
+        subprocess.run(['sudo', '-u', user, 'wine', 'reg', 'add',
+            'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Edge',
+            '/v', 'HideFirstRunExperience', '/t', 'REG_DWORD', '/d', '1', '/f'],
+            capture_output=True, env=user_env)
+
+        self.log_line.emit("✓ Wine configured: Windows 10, 96 DPI, Firefox as default browser")
+
+        self.progress.emit(100, "SelahBridge ready.")
+        self.finished.emit(True, user)
+
+
+class SelahBridgeSetup(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("SelahBridge Setup")
+        self.setFixedSize(700, 560)
+        self._build()
+        self._center()
+
+    def _center(self):
+        screen = QApplication.primaryScreen().geometry()
+        self.move(
+            (screen.width() - self.width()) // 2,
+            (screen.height() - self.height()) // 2
+        )
+
+    def _build(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(48, 40, 48, 40)
+        layout.setSpacing(20)
+
+        # Header
+        title = QLabel("SelahBridge™")
+        title.setFont(QFont('Noto Sans', 28, QFont.Weight.Light))
+        title.setStyleSheet(f"color: {COLORS['gold']};")
+        layout.addWidget(title)
+
+        subtitle = QLabel("Windows application compatibility for SelahOS")
+        subtitle.setFont(QFont('Noto Sans', 13))
+        subtitle.setStyleSheet(f"color: {COLORS['muted']};")
+        layout.addWidget(subtitle)
+
+        # Divider
+        div = QFrame()
+        div.setFixedHeight(1)
+        div.setStyleSheet(f"background: {COLORS['border']};")
+        layout.addWidget(div)
+
+        # Description
+        desc = QLabel(
+            "This will install:\n"
+            "  • Wine Staging — Windows application layer\n"
+            "  • DXVK — DirectX to Vulkan translation\n"
+            "  • WineASIO — Windows audio (ASIO) bridge\n"
+            "  • 32-bit libraries and PipeWire JACK support\n\n"
+            "Required: active internet connection. Takes 5-15 minutes."
+        )
+        desc.setFont(QFont('Noto Sans', 13))
+        desc.setStyleSheet(f"color: {COLORS['parch']}; line-height: 1.8;")
+        layout.addWidget(desc)
+
+        # Status label
+        self.status = QLabel("Ready to install.")
+        self.status.setFont(QFont('Noto Sans', 12))
+        self.status.setStyleSheet(f"color: {COLORS['teal']};")
+        layout.addWidget(self.status)
+
+        # Progress
+        self.progress = QProgressBar()
+        self.progress.setValue(0)
+        self.progress.setFixedHeight(6)
+        layout.addWidget(self.progress)
+
+        # Log output
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(140)
+        self.log.setPlaceholderText("Installation log will appear here...")
+        layout.addWidget(self.log)
+
+        # Button
+        self.btn = QPushButton("Install SelahBridge")
+        self.btn.setFixedHeight(48)
+        self.btn.clicked.connect(self._start)
+        layout.addWidget(self.btn)
+
+        # Note
+        note = QLabel("SelahOS v1.0-beta · Selah Technologies LLC")
+        note.setFont(QFont('Noto Sans', 11))
+        note.setStyleSheet(f"color: {COLORS['border']};")
+        note.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(note)
+
+    def _start(self):
+        if os.geteuid() != 0:
+            self.status.setText(
+                "⚠ Must run as root. Close this, open terminal, run:\n"
+                "sudo python3 /usr/local/bin/selahbridge-setup"
+            )
+            self.status.setStyleSheet(f"color: {COLORS['red']};")
+            return
+
+        self.btn.setEnabled(False)
+        self.btn.setText("Installing...")
+        self.log.clear()
+
+        self.worker = InstallWorker()
+        self.worker.progress.connect(self._on_progress)
+        self.worker.log_line.connect(self._on_log)
+        self.worker.finished.connect(self._on_done)
+        self.worker.start()
+
+    def _on_progress(self, pct, msg):
+        self.progress.setValue(pct)
+        self.status.setText(msg)
+
+    def _on_log(self, line):
+        self.log.append(line)
+        self.log.verticalScrollBar().setValue(
+            self.log.verticalScrollBar().maximum()
+        )
+
+    def _on_done(self, success, info):
+        if success:
+            self.progress.setValue(100)
+            self.status.setText(
+                f"✓ SelahBridge installed. Log out and back in to activate audio groups."
+            )
+            self.status.setStyleSheet(f"color: {COLORS['teal']};")
+            self.btn.setText("Done — Please Log Out and Back In")
+            self.btn.setEnabled(False)
+        else:
+            self.status.setText(f"✗ Installation failed: {info}")
+            self.status.setStyleSheet(f"color: {COLORS['red']};")
+            self.btn.setText("Retry")
+            self.btn.setEnabled(True)
+
+
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName("SelahBridge Setup")
+    app.setStyleSheet(STYLESHEET)
+    window = SelahBridgeSetup()
+    window.show()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()
