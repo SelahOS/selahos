@@ -1,0 +1,289 @@
+#!/usr/bin/env python3
+# ============================================================
+# SelahBridge™ Uninstaller
+# Copyright (C) 2026 Selah Technologies LLC
+# ============================================================
+
+import sys
+import os
+import subprocess
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QLabel, QPushButton, QCheckBox, QFrame, QTextEdit
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QFont
+
+COLORS = {
+    'bg':    '#0B0F1A',
+    'bg2':   '#111827',
+    'bg3':   '#1A2030',
+    'gold':  '#D6A85A',
+    'parch': '#EDE4D4',
+    'muted': '#9A8D7B',
+    'teal':  '#8EC3B8',
+    'red':   '#B97A6F',
+    'border':'#2A3042',
+}
+
+STYLESHEET = f"""
+QMainWindow, QWidget {{
+    background-color: {COLORS['bg']};
+    color: {COLORS['parch']};
+    font-family: 'Noto Sans', sans-serif;
+}}
+QLabel {{ background: transparent; color: {COLORS['parch']}; }}
+QPushButton {{
+    background-color: {COLORS['red']};
+    color: {COLORS['parch']};
+    border: none;
+    border-radius: 4px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: bold;
+}}
+QPushButton:hover {{ background-color: #C98A7F; }}
+QPushButton#cancel {{
+    background-color: transparent;
+    color: {COLORS['muted']};
+    border: 1px solid {COLORS['border']};
+}}
+QPushButton#cancel:hover {{
+    color: {COLORS['parch']};
+    border-color: {COLORS['muted']};
+}}
+QPushButton:disabled {{
+    background-color: {COLORS['border']};
+    color: {COLORS['muted']};
+}}
+QCheckBox {{
+    color: {COLORS['parch']};
+    font-size: 14px;
+    spacing: 10px;
+    padding: 4px 0;
+}}
+QCheckBox::indicator {{
+    width: 18px; height: 18px;
+    background: {COLORS['bg3']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 3px;
+}}
+QCheckBox::indicator:checked {{
+    background: {COLORS['red']};
+    border-color: {COLORS['red']};
+}}
+QTextEdit {{
+    background-color: {COLORS['bg2']};
+    color: {COLORS['muted']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px;
+}}
+"""
+
+PACKAGES = [
+    ("wine-staging",         "Wine Staging",          True),
+    ("wine-mono",            "Wine Mono (.NET)",       True),
+    ("wine-gecko",           "Wine Gecko (IE engine)", True),
+    ("winetricks",           "Winetricks",             True),
+    ("dxvk-async-git",       "DXVK Async",            True),
+    ("dxvk",                 "DXVK (stable)",          False),
+    ("wineasio",             "WineASIO",               True),
+    ("lib32-vulkan-intel",   "32-bit Vulkan (Intel)",  False),
+    ("realtime-privileges",  "Realtime Audio Group",   False),
+]
+
+
+class UninstallWorker(QThread):
+    log_line = pyqtSignal(str)
+    finished = pyqtSignal(bool)
+
+    def __init__(self, packages, remove_prefix, parent=None):
+        super().__init__(parent)
+        self.packages = packages
+        self.remove_prefix = remove_prefix
+
+    def run(self):
+        # Remove packages
+        to_remove = []
+        for pkg in self.packages:
+            result = subprocess.run(
+                ['pacman', '-Q', pkg],
+                capture_output=True
+            )
+            if result.returncode == 0:
+                to_remove.append(pkg)
+
+        if to_remove:
+            self.log_line.emit(f"Removing: {', '.join(to_remove)}")
+            result = subprocess.run(
+                ['pacman', '-Rs', '--noconfirm'] + to_remove,
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                self.log_line.emit("✓ Packages removed")
+            else:
+                self.log_line.emit(f"⚠ Some packages could not be removed")
+                if result.stderr:
+                    self.log_line.emit(result.stderr[:200])
+        else:
+            self.log_line.emit("No SelahBridge packages found to remove")
+
+        # Remove Wine prefix
+        if self.remove_prefix:
+            home = os.path.expanduser('~')
+            prefix = os.path.join(home, '.wine')
+            if os.path.exists(prefix):
+                self.log_line.emit("Removing Wine prefix (~/.wine)...")
+                subprocess.run(['rm', '-rf', prefix], capture_output=True)
+                self.log_line.emit("✓ Wine prefix removed")
+            else:
+                self.log_line.emit("No Wine prefix found")
+
+        # Remove SelahBridge init flag
+        flag = os.path.expanduser('~/.config/selahos/selahbridge-initialized')
+        if os.path.exists(flag):
+            os.remove(flag)
+
+        self.log_line.emit("✓ SelahBridge uninstall complete")
+        self.finished.emit(True)
+
+
+class SelahBridgeUninstaller(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Uninstall SelahBridge")
+        self.setFixedSize(640, 580)
+        self._build()
+        self._center()
+
+    def _center(self):
+        screen = QApplication.primaryScreen().geometry()
+        self.move(
+            (screen.width() - self.width()) // 2,
+            (screen.height() - self.height()) // 2
+        )
+
+    def _build(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(48, 36, 48, 36)
+        layout.setSpacing(16)
+
+        # Header
+        title = QLabel("Uninstall SelahBridge™")
+        title.setFont(QFont('Noto Sans', 24, QFont.Weight.Light))
+        title.setStyleSheet(f"color: {COLORS['red']};")
+        layout.addWidget(title)
+
+        sub = QLabel("Select components to remove")
+        sub.setFont(QFont('Noto Sans', 13))
+        sub.setStyleSheet(f"color: {COLORS['muted']};")
+        layout.addWidget(sub)
+
+        # Divider
+        div = QFrame()
+        div.setFixedHeight(1)
+        div.setStyleSheet(f"background: {COLORS['border']};")
+        layout.addWidget(div)
+
+        # Package checkboxes
+        self.checkboxes = {}
+        for pkg, label, default in PACKAGES:
+            cb = QCheckBox(label)
+            cb.setChecked(default)
+            layout.addWidget(cb)
+            self.checkboxes[pkg] = cb
+
+        # Divider
+        div2 = QFrame()
+        div2.setFixedHeight(1)
+        div2.setStyleSheet(f"background: {COLORS['border']};")
+        layout.addWidget(div2)
+
+        # Wine prefix option
+        self.remove_prefix = QCheckBox(
+            "Also remove Wine prefix (~/.wine) — deletes all installed Windows apps"
+        )
+        self.remove_prefix.setChecked(False)
+        self.remove_prefix.setStyleSheet(f"color: {COLORS['red']}; font-size: 13px;")
+        layout.addWidget(self.remove_prefix)
+
+        # Log
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(100)
+        self.log.setPlaceholderText("Uninstall log...")
+        layout.addWidget(self.log)
+
+        # Warning
+        warn = QLabel("⚠  This will remove selected components. Windows apps will stop working.")
+        warn.setFont(QFont('Noto Sans', 12))
+        warn.setStyleSheet(f"color: {COLORS['red']}; background: transparent;")
+        warn.setWordWrap(True)
+        layout.addWidget(warn)
+
+        # Buttons
+        btn_row = QVBoxLayout()
+        self.uninstall_btn = QPushButton("Uninstall Selected Components")
+        self.uninstall_btn.setFixedHeight(48)
+        self.uninstall_btn.clicked.connect(self._start)
+
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.setObjectName("cancel")
+        cancel_btn.setFixedHeight(40)
+        cancel_btn.clicked.connect(self.close)
+
+        btn_row.addWidget(self.uninstall_btn)
+        btn_row.addWidget(cancel_btn)
+        layout.addLayout(btn_row)
+
+    def _start(self):
+        if os.geteuid() != 0:
+            self.log.append(
+                "Must run as root. Close this and run:\n"
+                "sudo python3 /usr/local/bin/selahbridge-uninstaller"
+            )
+            return
+
+        selected = [
+            pkg for pkg, cb in self.checkboxes.items()
+            if cb.isChecked()
+        ]
+
+        if not selected and not self.remove_prefix.isChecked():
+            self.log.append("Nothing selected.")
+            return
+
+        self.uninstall_btn.setEnabled(False)
+        self.uninstall_btn.setText("Uninstalling...")
+
+        self.worker = UninstallWorker(
+            selected,
+            self.remove_prefix.isChecked()
+        )
+        self.worker.log_line.connect(self.log.append)
+        self.worker.finished.connect(self._done)
+        self.worker.start()
+
+    def _done(self, _):
+        self.uninstall_btn.setText("Uninstall Complete — Close Window")
+        self.uninstall_btn.setEnabled(True)
+        self.uninstall_btn.clicked.disconnect()
+        self.uninstall_btn.clicked.connect(self.close)
+
+
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName("SelahBridge Uninstaller")
+    app.setStyleSheet(STYLESHEET)
+    window = SelahBridgeUninstaller()
+    window.show()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

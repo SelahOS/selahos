@@ -1,0 +1,1128 @@
+#!/usr/bin/env python3
+# ============================================================
+# SelahBridge Manager v1.0.1
+# Copyright (C) 2026 Selah Technologies LLC
+# ============================================================
+
+import sys
+import os
+import subprocess
+import shutil
+import datetime
+from pathlib import Path
+
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QTabWidget, QLabel, QPushButton, QFrame, QTextEdit, QScrollArea,
+    QComboBox, QSlider, QCheckBox, QFileDialog, QMessageBox,
+    QProgressBar, QSizePolicy
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QFont
+
+VERSION = "1.0.1"
+
+COLORS = {
+    'bg':    '#0B0F1A',
+    'bg2':   '#111827',
+    'bg3':   '#1A2030',
+    'gold':  '#D6A85A',
+    'parch': '#EDE4D4',
+    'muted': '#9A8D7B',
+    'teal':  '#8EC3B8',
+    'red':   '#B97A6F',
+    'border':'#2A3042',
+}
+
+STYLESHEET = f"""
+QMainWindow, QWidget {{
+    background-color: {COLORS['bg']};
+    color: {COLORS['parch']};
+    font-family: 'Noto Sans', sans-serif;
+}}
+QLabel {{ background: transparent; color: {COLORS['parch']}; }}
+QTabWidget::pane {{
+    border: 1px solid {COLORS['border']};
+    border-radius: 0 4px 4px 4px;
+    background: {COLORS['bg']};
+}}
+QTabBar::tab {{
+    background: {COLORS['bg3']};
+    color: {COLORS['muted']};
+    border: 1px solid {COLORS['border']};
+    padding: 8px 20px;
+    margin-right: 2px;
+    border-radius: 4px 4px 0 0;
+}}
+QTabBar::tab:selected {{
+    background: {COLORS['bg']};
+    color: {COLORS['gold']};
+    border-bottom-color: {COLORS['bg']};
+}}
+QTabBar::tab:hover:!selected {{ color: {COLORS['parch']}; }}
+QPushButton {{
+    background-color: {COLORS['gold']};
+    color: {COLORS['bg']};
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: bold;
+}}
+QPushButton:hover {{ background-color: #E6C27A; }}
+QPushButton:disabled {{
+    background-color: {COLORS['border']};
+    color: {COLORS['muted']};
+}}
+QPushButton#danger {{
+    background-color: {COLORS['red']};
+    color: {COLORS['parch']};
+}}
+QPushButton#danger:hover {{ background-color: #C98A7F; }}
+QPushButton#secondary {{
+    background-color: transparent;
+    color: {COLORS['muted']};
+    border: 1px solid {COLORS['border']};
+}}
+QPushButton#secondary:hover {{
+    color: {COLORS['parch']};
+    border-color: {COLORS['muted']};
+}}
+QComboBox {{
+    background-color: {COLORS['bg3']};
+    color: {COLORS['parch']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    min-width: 240px;
+}}
+QComboBox::drop-down {{ border: none; padding-right: 8px; }}
+QComboBox QAbstractItemView {{
+    background-color: {COLORS['bg3']};
+    color: {COLORS['parch']};
+    border: 1px solid {COLORS['border']};
+    selection-background-color: {COLORS['gold']};
+    selection-color: {COLORS['bg']};
+}}
+QSlider::groove:horizontal {{
+    height: 4px;
+    background: {COLORS['border']};
+    border-radius: 2px;
+}}
+QSlider::handle:horizontal {{
+    background: {COLORS['gold']};
+    width: 16px; height: 16px;
+    margin: -6px 0;
+    border-radius: 8px;
+}}
+QSlider::sub-page:horizontal {{
+    background: {COLORS['gold']};
+    border-radius: 2px;
+}}
+QCheckBox {{
+    color: {COLORS['parch']};
+    font-size: 13px;
+    spacing: 10px;
+    padding: 4px 0;
+}}
+QCheckBox::indicator {{
+    width: 16px; height: 16px;
+    background: {COLORS['bg3']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 3px;
+}}
+QCheckBox::indicator:checked {{
+    background: {COLORS['gold']};
+    border-color: {COLORS['gold']};
+}}
+QTextEdit {{
+    background-color: {COLORS['bg2']};
+    color: {COLORS['muted']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px;
+}}
+QScrollArea {{
+    border: none;
+    background: transparent;
+}}
+QScrollBar:vertical {{
+    background: {COLORS['bg3']};
+    width: 8px;
+    border-radius: 4px;
+}}
+QScrollBar::handle:vertical {{
+    background: {COLORS['border']};
+    border-radius: 4px;
+    min-height: 20px;
+}}
+"""
+
+
+def _user_and_home():
+    user = os.environ.get('SUDO_USER') or os.environ.get('USER') or 'dbnoble'
+    home = Path(f'/home/{user}') if user != 'root' else Path('/root')
+    return user, home
+
+
+def _wine_env(user, home):
+    return {
+        **os.environ,
+        'HOME': str(home),
+        'USER': user,
+        'WINEPREFIX': str(home / '.wine'),
+        'WINEARCH': 'win64',
+        'DISPLAY': os.environ.get('DISPLAY', ':0'),
+    }
+
+
+def _uid_of(user):
+    try:
+        import pwd
+        return pwd.getpwnam(user).pw_uid
+    except Exception:
+        return 1000
+
+
+def _divider():
+    div = QFrame()
+    div.setFixedHeight(1)
+    div.setStyleSheet(f"background: {COLORS['border']};")
+    return div
+
+
+def _log_append(log_widget, text):
+    log_widget.append(text)
+    log_widget.verticalScrollBar().setValue(log_widget.verticalScrollBar().maximum())
+
+
+# ─────────────────────────────────────────────────────────
+# Tab 1 — Installed Apps
+# ─────────────────────────────────────────────────────────
+
+class AppRow(QFrame):
+    launch_requested   = pyqtSignal(str, str)
+    uninstall_requested = pyqtSignal(str, str)
+
+    def __init__(self, name, exe_path):
+        super().__init__()
+        self.name = name
+        self.exe_path = exe_path
+        self.setStyleSheet(f"QFrame {{ background: {COLORS['bg3']}; border: 1px solid {COLORS['border']}; border-radius: 4px; }}")
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(16, 10, 16, 10)
+
+        name_lbl = QLabel(name)
+        name_lbl.setFont(QFont('Noto Sans', 13))
+        name_lbl.setMinimumWidth(180)
+        layout.addWidget(name_lbl)
+
+        path_lbl = QLabel(exe_path)
+        path_lbl.setFont(QFont('JetBrains Mono', 11))
+        path_lbl.setStyleSheet(f"color: {COLORS['muted']};")
+        path_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        layout.addWidget(path_lbl)
+
+        launch_btn = QPushButton("Launch")
+        launch_btn.setFixedWidth(80)
+        launch_btn.clicked.connect(lambda: self.launch_requested.emit(self.name, self.exe_path))
+        layout.addWidget(launch_btn)
+
+        remove_btn = QPushButton("Remove")
+        remove_btn.setObjectName("danger")
+        remove_btn.setFixedWidth(80)
+        remove_btn.clicked.connect(lambda: self.uninstall_requested.emit(self.name, self.exe_path))
+        layout.addWidget(remove_btn)
+
+
+class AppsTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.user, self.home = _user_and_home()
+        self._build()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(24, 20, 24, 20)
+        layout.setSpacing(12)
+
+        header = QHBoxLayout()
+        title = QLabel("Installed Windows Apps")
+        title.setFont(QFont('Noto Sans', 15, QFont.Weight.Bold))
+        title.setStyleSheet(f"color: {COLORS['gold']};")
+        header.addWidget(title)
+        header.addStretch()
+
+        refresh_btn = QPushButton("Refresh")
+        refresh_btn.setObjectName("secondary")
+        refresh_btn.clicked.connect(self._scan)
+        header.addWidget(refresh_btn)
+
+        add_btn = QPushButton("+ Add App")
+        add_btn.clicked.connect(self._add_app)
+        header.addWidget(add_btn)
+        layout.addLayout(header)
+
+        self.no_prefix_lbl = QLabel(
+            "Wine prefix not found. Install SelahBridge first, or initialize it in Wine Settings."
+        )
+        self.no_prefix_lbl.setStyleSheet(f"color: {COLORS['red']}; padding: 12px;")
+        self.no_prefix_lbl.setWordWrap(True)
+        self.no_prefix_lbl.hide()
+        layout.addWidget(self.no_prefix_lbl)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet(f"QScrollArea {{ background: {COLORS['bg2']}; border: 1px solid {COLORS['border']}; border-radius: 4px; }}")
+
+        self.apps_container = QWidget()
+        self.apps_container.setStyleSheet(f"background: {COLORS['bg2']};")
+        self.apps_layout = QVBoxLayout(self.apps_container)
+        self.apps_layout.setContentsMargins(8, 8, 8, 8)
+        self.apps_layout.setSpacing(4)
+        self.apps_layout.addStretch()
+        scroll.setWidget(self.apps_container)
+        layout.addWidget(scroll)
+
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(72)
+        self.log.setPlaceholderText("Action log...")
+        layout.addWidget(self.log)
+
+        self._scan()
+
+    def _scan(self):
+        while self.apps_layout.count() > 1:
+            item = self.apps_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        drive_c = self.home / '.wine' / 'drive_c'
+        if not drive_c.exists():
+            self.no_prefix_lbl.show()
+            return
+        self.no_prefix_lbl.hide()
+
+        found = []
+        for prog_dir in ['Program Files', 'Program Files (x86)']:
+            base = drive_c / prog_dir
+            if not base.exists():
+                continue
+            for app_dir in sorted(base.iterdir()):
+                if not app_dir.is_dir():
+                    continue
+                exes = list(app_dir.glob('*.exe')) or list(app_dir.rglob('*.exe'))
+                if exes:
+                    found.append((app_dir.name, str(exes[0])))
+
+        if not found:
+            lbl = QLabel("No Windows applications found.")
+            lbl.setStyleSheet(f"color: {COLORS['muted']}; padding: 20px;")
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.apps_layout.insertWidget(0, lbl)
+            return
+
+        for name, exe_path in found:
+            row = AppRow(name, exe_path)
+            row.launch_requested.connect(self._launch)
+            row.uninstall_requested.connect(self._remove)
+            self.apps_layout.insertWidget(self.apps_layout.count() - 1, row)
+
+    def _launch(self, name, exe_path):
+        _log_append(self.log, f"Launching {name}...")
+        subprocess.Popen(
+            ['sudo', '-u', self.user, 'wine', exe_path],
+            env=_wine_env(self.user, self.home)
+        )
+        _log_append(self.log, f"✓ {name} launched")
+
+    def _remove(self, name, exe_path):
+        if QMessageBox.question(
+            self, "Remove App",
+            f"Remove {name}?\nThis deletes the app directory.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        try:
+            shutil.rmtree(str(Path(exe_path).parent))
+            _log_append(self.log, f"✓ {name} removed")
+            self._scan()
+        except Exception as e:
+            _log_append(self.log, f"✗ {e}")
+
+    def _add_app(self):
+        default_dir = str(self.home / '.wine' / 'drive_c')
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Select Windows Executable", default_dir, "Executables (*.exe)"
+        )
+        if not path:
+            return
+        _log_append(self.log, f"Launching {Path(path).stem}...")
+        subprocess.Popen(
+            ['sudo', '-u', self.user, 'wine', path],
+            env=_wine_env(self.user, self.home)
+        )
+        self._scan()
+
+
+# ─────────────────────────────────────────────────────────
+# Tab 2 — Wine Settings
+# ─────────────────────────────────────────────────────────
+
+class SettingsTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.user, self.home = _user_and_home()
+        self._build()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(40, 24, 40, 24)
+        layout.setSpacing(14)
+
+        title = QLabel("Wine Settings")
+        title.setFont(QFont('Noto Sans', 15, QFont.Weight.Bold))
+        title.setStyleSheet(f"color: {COLORS['gold']};")
+        layout.addWidget(title)
+
+        hint = QLabel("Applied directly via wine reg — no winecfg required.")
+        hint.setFont(QFont('Noto Sans', 12))
+        hint.setStyleSheet(f"color: {COLORS['muted']};")
+        layout.addWidget(hint)
+
+        layout.addWidget(_divider())
+
+        # Windows version
+        layout.addWidget(self._field_label("Windows Version"))
+        self.win_version = QComboBox()
+        for label, val in [
+            ("Windows 10  (recommended)", "win10"),
+            ("Windows 11", "win11"),
+            ("Windows 7",  "win7"),
+            ("Windows XP", "winxp"),
+        ]:
+            self.win_version.addItem(label, val)
+        layout.addWidget(self.win_version)
+
+        # DPI
+        layout.addWidget(self._field_label("Display DPI"))
+        dpi_row = QHBoxLayout()
+        self.dpi_slider = QSlider(Qt.Orientation.Horizontal)
+        self.dpi_slider.setRange(72, 192)
+        self.dpi_slider.setValue(96)
+        self.dpi_slider.setFixedWidth(320)
+        self.dpi_val = QLabel("96 DPI")
+        self.dpi_val.setFont(QFont('JetBrains Mono', 12))
+        self.dpi_val.setStyleSheet(f"color: {COLORS['teal']};")
+        self.dpi_slider.valueChanged.connect(lambda v: self.dpi_val.setText(f"{v} DPI"))
+        dpi_row.addWidget(self.dpi_slider)
+        dpi_row.addWidget(self.dpi_val)
+        dpi_row.addStretch()
+        layout.addLayout(dpi_row)
+
+        # Audio driver
+        layout.addWidget(self._field_label("Audio Driver"))
+        self.audio_driver = QComboBox()
+        for label, val in [
+            ("WineASIO  (recommended for DAWs)", "wineasio"),
+            ("PulseAudio", "pulse"),
+            ("ALSA",       "alsa"),
+        ]:
+            self.audio_driver.addItem(label, val)
+        layout.addWidget(self.audio_driver)
+
+        # Default browser
+        layout.addWidget(self._field_label("Default Browser"))
+        self.browser = QComboBox()
+        for label, val in [
+            ("Firefox  (recommended — installed by SelahBridge)", "firefox"),
+            ("Edge  (Wine default)",  "edge"),
+            ("Custom path...",        "custom"),
+        ]:
+            self.browser.addItem(label, val)
+        layout.addWidget(self.browser)
+
+        layout.addWidget(_divider())
+
+        # Prefix init row
+        init_row = QHBoxLayout()
+        init_lbl = QLabel("Wine Prefix")
+        init_lbl.setFont(QFont('Noto Sans', 13))
+        init_row.addWidget(init_lbl)
+        init_row.addStretch()
+        self.init_btn = QPushButton("Initialize / Re-initialize Prefix")
+        self.init_btn.setObjectName("secondary")
+        self.init_btn.clicked.connect(self._init_prefix)
+        init_row.addWidget(self.init_btn)
+        layout.addLayout(init_row)
+
+        layout.addStretch()
+
+        self.apply_btn = QPushButton("Apply Settings")
+        self.apply_btn.setFixedHeight(44)
+        self.apply_btn.clicked.connect(self._apply)
+        layout.addWidget(self.apply_btn)
+
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(100)
+        layout.addWidget(self.log)
+
+    def _field_label(self, text):
+        lbl = QLabel(text)
+        lbl.setFont(QFont('Noto Sans', 13))
+        lbl.setStyleSheet("margin-top: 4px;")
+        return lbl
+
+    def _apply(self):
+        if not (self.home / '.wine').exists():
+            _log_append(self.log, "✗ Wine prefix not found — initialize it first.")
+            return
+
+        env = _wine_env(self.user, self.home)
+
+        def reg(key, name, kind, value):
+            return subprocess.run(
+                ['sudo', '-u', self.user, 'wine', 'reg', 'add', key,
+                 '/v', name, '/t', kind, '/d', str(value), '/f'],
+                capture_output=True, env=env
+            ).returncode == 0
+
+        ok = []
+        fail = []
+
+        win_ver = self.win_version.currentData()
+        (ok if reg('HKEY_CURRENT_USER\\Software\\Wine', 'Version', 'REG_SZ', win_ver)
+            else fail).append(f"Windows version ({win_ver})")
+
+        dpi = self.dpi_slider.value()
+        (ok if reg('HKEY_CURRENT_USER\\Control Panel\\Desktop', 'LogPixels', 'REG_DWORD', dpi)
+            else fail).append(f"DPI ({dpi})")
+
+        driver = self.audio_driver.currentData()
+        (ok if reg('HKEY_CURRENT_USER\\Software\\Wine\\Drivers', 'Audio', 'REG_SZ', driver)
+            else fail).append(f"Audio driver ({driver})")
+
+        browser_val = self.browser.currentData()
+        if browser_val == 'firefox':
+            browser_cmd = '"C:\\Program Files\\Mozilla Firefox\\firefox.exe" "%1"'
+        elif browser_val == 'custom':
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Browser Executable",
+                str(self.home / '.wine' / 'drive_c'), "*.exe"
+            )
+            browser_cmd = f'"{path}" "%1"' if path else None
+        else:
+            browser_cmd = None
+
+        if browser_cmd:
+            for proto in ['http', 'https']:
+                reg(f'HKEY_CURRENT_USER\\Software\\Classes\\{proto}\\shell\\open\\command',
+                    '', 'REG_SZ', browser_cmd)
+            ok.append("browser")
+
+        for item in ok:
+            _log_append(self.log, f"✓ {item}")
+        for item in fail:
+            _log_append(self.log, f"⚠ failed: {item}")
+        if not fail:
+            _log_append(self.log, "All settings applied.")
+
+    def _init_prefix(self):
+        _log_append(self.log, "Initializing Wine prefix (win64)...")
+        self.init_btn.setEnabled(False)
+        subprocess.Popen(
+            ['sudo', '-u', self.user, 'wine', 'wineboot', '-i'],
+            env=_wine_env(self.user, self.home)
+        )
+        _log_append(self.log, "Initialization started — this may take a moment.")
+        self.init_btn.setEnabled(True)
+
+
+# ─────────────────────────────────────────────────────────
+# Tab 3 — Audio
+# ─────────────────────────────────────────────────────────
+
+BUFFER_SIZES = [64, 128, 256, 512, 1024]
+
+
+class AudioTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.user, self.home = _user_and_home()
+        self._build()
+        self._refresh_device()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(40, 24, 40, 24)
+        layout.setSpacing(14)
+
+        title = QLabel("Audio Configuration")
+        title.setFont(QFont('Noto Sans', 15, QFont.Weight.Bold))
+        title.setStyleSheet(f"color: {COLORS['gold']};")
+        layout.addWidget(title)
+
+        self.device_lbl = QLabel("Detecting audio device...")
+        self.device_lbl.setFont(QFont('JetBrains Mono', 12))
+        self.device_lbl.setStyleSheet(f"color: {COLORS['teal']};")
+        layout.addWidget(self.device_lbl)
+
+        layout.addWidget(_divider())
+
+        layout.addWidget(self._section("PipeWire / JACK Buffer Size"))
+
+        buf_row = QHBoxLayout()
+        self.buf_slider = QSlider(Qt.Orientation.Horizontal)
+        self.buf_slider.setRange(0, len(BUFFER_SIZES) - 1)
+        self.buf_slider.setValue(2)
+        self.buf_slider.setFixedWidth(300)
+        self.buf_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.buf_slider.setTickInterval(1)
+        self.buf_val_lbl = QLabel("256 samples")
+        self.buf_val_lbl.setFont(QFont('JetBrains Mono', 12))
+        self.buf_val_lbl.setStyleSheet(f"color: {COLORS['teal']};")
+        self.buf_slider.valueChanged.connect(
+            lambda v: self.buf_val_lbl.setText(f"{BUFFER_SIZES[v]} samples")
+        )
+        buf_row.addWidget(self.buf_slider)
+        buf_row.addWidget(self.buf_val_lbl)
+        buf_row.addStretch()
+        layout.addLayout(buf_row)
+
+        hint = QLabel("Lower = less latency (needs faster CPU).  256 is a safe default.")
+        hint.setFont(QFont('Noto Sans', 11))
+        hint.setStyleSheet(f"color: {COLORS['muted']};")
+        layout.addWidget(hint)
+
+        apply_buf = QPushButton("Apply Buffer Size")
+        apply_buf.setObjectName("secondary")
+        apply_buf.setFixedWidth(200)
+        apply_buf.clicked.connect(self._apply_buffer)
+        layout.addWidget(apply_buf)
+
+        layout.addWidget(_divider())
+
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(12)
+
+        reg_btn = QPushButton("Register WineASIO")
+        reg_btn.clicked.connect(self._register_asio)
+        btn_row.addWidget(reg_btn)
+
+        restart_btn = QPushButton("Restart PipeWire")
+        restart_btn.clicked.connect(self._restart_pipewire)
+        btn_row.addWidget(restart_btn)
+
+        refresh_btn = QPushButton("Refresh Devices")
+        refresh_btn.setObjectName("secondary")
+        refresh_btn.clicked.connect(self._refresh_device)
+        btn_row.addWidget(refresh_btn)
+
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
+
+        layout.addStretch()
+
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(140)
+        layout.addWidget(self.log)
+
+    def _section(self, text):
+        lbl = QLabel(text)
+        lbl.setFont(QFont('Noto Sans', 13))
+        lbl.setStyleSheet("margin-top: 4px;")
+        return lbl
+
+    def _refresh_device(self):
+        try:
+            r = subprocess.run(['pactl', 'list', 'sinks'], capture_output=True, text=True, timeout=5)
+            name = None
+            for line in r.stdout.splitlines():
+                if 'Name:' in line:
+                    name = line.split('Name:')[-1].strip()
+                    break
+            self.device_lbl.setText(f"Active sink: {name}" if name else "No audio sinks detected")
+        except Exception:
+            self.device_lbl.setText("Could not query audio devices")
+
+    def _apply_buffer(self):
+        size = BUFFER_SIZES[self.buf_slider.value()]
+        conf_dir = self.home / '.config' / 'pipewire'
+        conf_dir.mkdir(parents=True, exist_ok=True)
+        jack_conf = conf_dir / 'jack.conf'
+        jack_conf.write_text(
+            f"context.properties = {{\n"
+            f"    default.clock.rate = 48000\n"
+            f"    default.clock.quantum = {size}\n"
+            f"    default.clock.min-quantum = 64\n"
+            f"    default.clock.max-quantum = 8192\n"
+            f"}}\n"
+        )
+        if os.geteuid() == 0:
+            subprocess.run(['chown', f'{self.user}:{self.user}', str(jack_conf)], capture_output=True)
+        _log_append(self.log, f"✓ Buffer set to {size} samples — restart PipeWire to apply.")
+
+    def _register_asio(self):
+        _log_append(self.log, "Registering WineASIO...")
+        r = subprocess.run(
+            ['sudo', '-u', self.user, 'wine', 'regsvr32', 'wineasio.dll'],
+            capture_output=True, text=True,
+            env=_wine_env(self.user, self.home), timeout=30
+        )
+        _log_append(self.log, "✓ WineASIO registered" if r.returncode == 0
+                    else f"⚠ Return code {r.returncode}: {r.stderr[:120]}")
+
+    def _restart_pipewire(self):
+        _log_append(self.log, "Restarting PipeWire and WirePlumber...")
+        uid = _uid_of(self.user)
+        env = {**os.environ, 'DBUS_SESSION_BUS_ADDRESS': f'unix:path=/run/user/{uid}/bus'}
+        for svc in ['pipewire', 'wireplumber']:
+            r = subprocess.run(
+                ['sudo', '-u', self.user, 'systemctl', '--user', 'restart', svc],
+                capture_output=True, text=True, timeout=10, env=env
+            )
+            _log_append(self.log, f"{'✓' if r.returncode == 0 else '⚠'} {svc}")
+        self._refresh_device()
+
+
+# ─────────────────────────────────────────────────────────
+# Tab 4 — Snapshots
+# ─────────────────────────────────────────────────────────
+
+SNAPSHOT_DIR = 'selahbridge-snapshots'
+
+
+class SnapshotWorker(QThread):
+    log_line = pyqtSignal(str)
+    finished = pyqtSignal(bool)
+
+    def __init__(self, mode, home, user, snapshot_path=None):
+        super().__init__()
+        self.mode = mode
+        self.home = home
+        self.user = user
+        self.snapshot_path = snapshot_path
+
+    def run(self):
+        prefix = self.home / '.wine'
+        snap_dir = self.home / SNAPSHOT_DIR
+        snap_dir.mkdir(exist_ok=True)
+
+        if self.mode == 'create':
+            ts = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+            out = snap_dir / f'selahbridge-{ts}.tar.gz'
+            self.log_line.emit(f"Creating {out.name}...")
+            r = subprocess.run(
+                ['tar', '-czf', str(out), '-C', str(self.home), '.wine'],
+                capture_output=True, text=True
+            )
+            if r.returncode == 0:
+                size_mb = out.stat().st_size / 1048576
+                self.log_line.emit(f"✓ {out.name}  ({size_mb:.1f} MB)")
+                self.finished.emit(True)
+            else:
+                self.log_line.emit(f"✗ {r.stderr[:200]}")
+                self.finished.emit(False)
+
+        elif self.mode == 'restore' and self.snapshot_path:
+            bak = self.home / '.wine.bak'
+            if prefix.exists():
+                if bak.exists():
+                    shutil.rmtree(bak)
+                prefix.rename(bak)
+                self.log_line.emit("Current prefix backed up to ~/.wine.bak")
+            r = subprocess.run(
+                ['tar', '-xzf', self.snapshot_path, '-C', str(self.home)],
+                capture_output=True, text=True
+            )
+            if r.returncode == 0:
+                self.log_line.emit("✓ Snapshot restored")
+                self.finished.emit(True)
+            else:
+                self.log_line.emit(f"✗ {r.stderr[:200]}")
+                self.finished.emit(False)
+
+
+class SnapshotRow(QFrame):
+    restore_requested = pyqtSignal(str)
+    delete_requested  = pyqtSignal(str)
+
+    def __init__(self, path: Path):
+        super().__init__()
+        self.path = path
+        self.setStyleSheet(f"QFrame {{ background: {COLORS['bg3']}; border: 1px solid {COLORS['border']}; border-radius: 4px; }}")
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(16, 10, 16, 10)
+
+        name_lbl = QLabel(path.name)
+        name_lbl.setFont(QFont('JetBrains Mono', 12))
+        name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        layout.addWidget(name_lbl)
+
+        try:
+            size_lbl = QLabel(f"{path.stat().st_size / 1048576:.1f} MB")
+        except Exception:
+            size_lbl = QLabel("? MB")
+        size_lbl.setFont(QFont('JetBrains Mono', 11))
+        size_lbl.setStyleSheet(f"color: {COLORS['muted']};")
+        size_lbl.setFixedWidth(80)
+        layout.addWidget(size_lbl)
+
+        restore_btn = QPushButton("Restore")
+        restore_btn.setFixedWidth(80)
+        restore_btn.clicked.connect(lambda: self.restore_requested.emit(str(self.path)))
+        layout.addWidget(restore_btn)
+
+        del_btn = QPushButton("Delete")
+        del_btn.setObjectName("danger")
+        del_btn.setFixedWidth(80)
+        del_btn.clicked.connect(lambda: self.delete_requested.emit(str(self.path)))
+        layout.addWidget(del_btn)
+
+
+class SnapshotsTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.user, self.home = _user_and_home()
+        self._build()
+        self._refresh()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(24, 20, 24, 20)
+        layout.setSpacing(12)
+
+        header = QHBoxLayout()
+        title = QLabel("Wine Prefix Snapshots")
+        title.setFont(QFont('Noto Sans', 15, QFont.Weight.Bold))
+        title.setStyleSheet(f"color: {COLORS['gold']};")
+        header.addWidget(title)
+        header.addStretch()
+        self.disk_lbl = QLabel("calculating...")
+        self.disk_lbl.setFont(QFont('JetBrains Mono', 11))
+        self.disk_lbl.setStyleSheet(f"color: {COLORS['muted']};")
+        header.addWidget(self.disk_lbl)
+        layout.addLayout(header)
+
+        create_btn = QPushButton("Create Snapshot Now")
+        create_btn.setFixedWidth(220)
+        create_btn.clicked.connect(self._create)
+        layout.addWidget(create_btn)
+
+        hint = QLabel(f"Snapshots saved to ~/{SNAPSHOT_DIR}/")
+        hint.setFont(QFont('Noto Sans', 11))
+        hint.setStyleSheet(f"color: {COLORS['muted']};")
+        layout.addWidget(hint)
+
+        layout.addWidget(_divider())
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet(f"QScrollArea {{ background: {COLORS['bg2']}; border: 1px solid {COLORS['border']}; border-radius: 4px; }}")
+        self.snaps_container = QWidget()
+        self.snaps_container.setStyleSheet(f"background: {COLORS['bg2']};")
+        self.snaps_layout = QVBoxLayout(self.snaps_container)
+        self.snaps_layout.setContentsMargins(8, 8, 8, 8)
+        self.snaps_layout.setSpacing(4)
+        self.snaps_layout.addStretch()
+        scroll.setWidget(self.snaps_container)
+        layout.addWidget(scroll)
+
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(72)
+        layout.addWidget(self.log)
+
+    def _refresh(self):
+        while self.snaps_layout.count() > 1:
+            item = self.snaps_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        prefix = self.home / '.wine'
+        if prefix.exists():
+            try:
+                r = subprocess.run(['du', '-sh', str(prefix)], capture_output=True, text=True)
+                self.disk_lbl.setText(f"~/.wine: {r.stdout.split()[0]}")
+            except Exception:
+                self.disk_lbl.setText("~/.wine: ?")
+        else:
+            self.disk_lbl.setText("~/.wine: not found")
+
+        snap_dir = self.home / SNAPSHOT_DIR
+        snapshots = sorted(snap_dir.glob('*.tar.gz'), reverse=True) if snap_dir.exists() else []
+
+        if not snapshots:
+            lbl = QLabel("No snapshots yet.")
+            lbl.setStyleSheet(f"color: {COLORS['muted']}; padding: 20px;")
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.snaps_layout.insertWidget(0, lbl)
+            return
+
+        for snap_path in snapshots:
+            row = SnapshotRow(snap_path)
+            row.restore_requested.connect(self._restore)
+            row.delete_requested.connect(self._delete)
+            self.snaps_layout.insertWidget(self.snaps_layout.count() - 1, row)
+
+    def _create(self):
+        _log_append(self.log, "Creating snapshot...")
+        self.worker = SnapshotWorker('create', self.home, self.user)
+        self.worker.log_line.connect(lambda t: _log_append(self.log, t))
+        self.worker.finished.connect(lambda ok: self._refresh() if ok else None)
+        self.worker.start()
+
+    def _restore(self, path):
+        if QMessageBox.question(
+            self, "Restore Snapshot",
+            f"Restore from {Path(path).name}?\n\nCurrent prefix backed up to ~/.wine.bak",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        self.worker = SnapshotWorker('restore', self.home, self.user, path)
+        self.worker.log_line.connect(lambda t: _log_append(self.log, t))
+        self.worker.finished.connect(lambda _: self._refresh())
+        self.worker.start()
+
+    def _delete(self, path):
+        if QMessageBox.question(
+            self, "Delete Snapshot",
+            f"Delete {Path(path).name}?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        try:
+            os.remove(path)
+            _log_append(self.log, f"✓ Deleted {Path(path).name}")
+            self._refresh()
+        except Exception as e:
+            _log_append(self.log, f"✗ {e}")
+
+
+# ─────────────────────────────────────────────────────────
+# Tab 5 — Uninstall
+# ─────────────────────────────────────────────────────────
+
+UNINSTALL_PACKAGES = [
+    ("wine-staging",        "Wine Staging",          True),
+    ("wine-mono",           "Wine Mono (.NET)",       True),
+    ("wine-gecko",          "Wine Gecko (IE engine)", True),
+    ("winetricks",          "Winetricks",             True),
+    ("dxvk-async-git",      "DXVK Async",            True),
+    ("dxvk",                "DXVK (stable)",          False),
+    ("wineasio",            "WineASIO",               True),
+    ("lib32-vulkan-intel",  "32-bit Vulkan (Intel)",  False),
+    ("realtime-privileges", "Realtime Audio Group",   False),
+]
+
+
+class UninstallWorker(QThread):
+    log_line = pyqtSignal(str)
+    finished = pyqtSignal(bool)
+
+    def __init__(self, packages, remove_prefix, home):
+        super().__init__()
+        self.packages = packages
+        self.remove_prefix = remove_prefix
+        self.home = home
+
+    def run(self):
+        to_remove = [
+            p for p in self.packages
+            if subprocess.run(['pacman', '-Q', p], capture_output=True).returncode == 0
+        ]
+        if to_remove:
+            self.log_line.emit(f"Removing: {', '.join(to_remove)}")
+            r = subprocess.run(
+                ['pacman', '-Rs', '--noconfirm'] + to_remove,
+                capture_output=True, text=True
+            )
+            self.log_line.emit(
+                "✓ Packages removed" if r.returncode == 0
+                else f"⚠ Some could not be removed: {r.stderr[:120]}"
+            )
+        else:
+            self.log_line.emit("No SelahBridge packages found.")
+
+        if self.remove_prefix:
+            prefix = self.home / '.wine'
+            if prefix.exists():
+                self.log_line.emit("Removing ~/.wine...")
+                shutil.rmtree(prefix)
+                self.log_line.emit("✓ Wine prefix removed")
+
+        flag = self.home / '.config' / 'selahos' / 'selahbridge-initialized'
+        if flag.exists():
+            flag.unlink()
+
+        self.log_line.emit("✓ Uninstall complete.")
+        self.finished.emit(True)
+
+
+class UninstallTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.user, self.home = _user_and_home()
+        self._build()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(40, 24, 40, 24)
+        layout.setSpacing(12)
+
+        title = QLabel("Uninstall SelahBridge")
+        title.setFont(QFont('Noto Sans', 15, QFont.Weight.Bold))
+        title.setStyleSheet(f"color: {COLORS['red']};")
+        layout.addWidget(title)
+
+        sub = QLabel("Select components to remove:")
+        sub.setFont(QFont('Noto Sans', 12))
+        sub.setStyleSheet(f"color: {COLORS['muted']};")
+        layout.addWidget(sub)
+
+        layout.addWidget(_divider())
+
+        self.checkboxes = {}
+        for pkg, label, default in UNINSTALL_PACKAGES:
+            cb = QCheckBox(label)
+            cb.setChecked(default)
+            layout.addWidget(cb)
+            self.checkboxes[pkg] = cb
+
+        layout.addWidget(_divider())
+
+        self.remove_prefix_cb = QCheckBox(
+            "Also delete Wine prefix (~/.wine)  —  removes all installed Windows apps"
+        )
+        self.remove_prefix_cb.setChecked(False)
+        self.remove_prefix_cb.setStyleSheet(f"color: {COLORS['red']}; font-size: 13px;")
+        layout.addWidget(self.remove_prefix_cb)
+
+        warn = QLabel("⚠  Selected components will be permanently removed.")
+        warn.setFont(QFont('Noto Sans', 12))
+        warn.setStyleSheet(f"color: {COLORS['red']}; background: transparent;")
+        warn.setWordWrap(True)
+        layout.addWidget(warn)
+
+        self.log = QTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setFixedHeight(100)
+        layout.addWidget(self.log)
+
+        layout.addStretch()
+
+        self.uninstall_btn = QPushButton("Uninstall Selected Components")
+        self.uninstall_btn.setObjectName("danger")
+        self.uninstall_btn.setFixedHeight(48)
+        self.uninstall_btn.clicked.connect(self._start)
+        layout.addWidget(self.uninstall_btn)
+
+    def _start(self):
+        if os.geteuid() != 0:
+            _log_append(self.log, "Must run as root. Close and run: pkexec selahbridge-manager")
+            return
+
+        selected = [pkg for pkg, cb in self.checkboxes.items() if cb.isChecked()]
+        if not selected and not self.remove_prefix_cb.isChecked():
+            _log_append(self.log, "Nothing selected.")
+            return
+
+        if QMessageBox.question(
+            self, "Confirm Uninstall",
+            "This cannot be undone (unless you have a snapshot). Continue?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        ) != QMessageBox.StandardButton.Yes:
+            return
+
+        self.uninstall_btn.setEnabled(False)
+        self.uninstall_btn.setText("Uninstalling...")
+
+        self.worker = UninstallWorker(selected, self.remove_prefix_cb.isChecked(), self.home)
+        self.worker.log_line.connect(lambda t: _log_append(self.log, t))
+        self.worker.finished.connect(self._done)
+        self.worker.start()
+
+    def _done(self, _):
+        self.uninstall_btn.setText("Uninstall Complete")
+        self.uninstall_btn.setEnabled(False)
+
+
+# ─────────────────────────────────────────────────────────
+# Main Window
+# ─────────────────────────────────────────────────────────
+
+class SelahBridgeManager(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(f"SelahBridge Manager  v{VERSION}")
+        self.setMinimumSize(920, 700)
+        self._build()
+        screen = QApplication.primaryScreen().geometry()
+        self.move(
+            (screen.width()  - self.width())  // 2,
+            (screen.height() - self.height()) // 2,
+        )
+
+    def _build(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        root = QVBoxLayout(central)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+
+        # Header bar
+        header = QWidget()
+        header.setStyleSheet(
+            f"background: {COLORS['bg3']}; border-bottom: 1px solid {COLORS['border']};"
+        )
+        header.setFixedHeight(56)
+        h_layout = QHBoxLayout(header)
+        h_layout.setContentsMargins(24, 0, 24, 0)
+
+        brand = QLabel("SelahBridge™ Manager")
+        brand.setFont(QFont('Noto Sans', 16, QFont.Weight.Light))
+        brand.setStyleSheet(f"color: {COLORS['gold']}; border: none;")
+        h_layout.addWidget(brand)
+
+        ver_lbl = QLabel(f"v{VERSION}")
+        ver_lbl.setFont(QFont('JetBrains Mono', 11))
+        ver_lbl.setStyleSheet(f"color: {COLORS['muted']}; border: none;")
+        h_layout.addWidget(ver_lbl)
+
+        h_layout.addStretch()
+
+        tagline = QLabel("Pause. Reflect. Create.")
+        tagline.setFont(QFont('Noto Sans', 11))
+        tagline.setStyleSheet(f"color: {COLORS['muted']}; border: none;")
+        h_layout.addWidget(tagline)
+
+        root.addWidget(header)
+
+        # Tabs
+        tabs = QTabWidget()
+        tabs.setContentsMargins(8, 8, 8, 8)
+        tabs.addTab(AppsTab(),      "Installed Apps")
+        tabs.addTab(SettingsTab(),  "Wine Settings")
+        tabs.addTab(AudioTab(),     "Audio")
+        tabs.addTab(SnapshotsTab(), "Snapshots")
+        tabs.addTab(UninstallTab(), "Uninstall")
+        root.addWidget(tabs)
+
+
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName("SelahBridge Manager")
+    app.setStyleSheet(STYLESHEET)
+    window = SelahBridgeManager()
+    window.show()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

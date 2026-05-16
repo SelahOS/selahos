@@ -1,0 +1,19 @@
+# Build outputs — large working directories created by mkarchiso
+selahos-build/
+selahos-iso-output/
+work/
+out/
+
+# Intermediate tarballs (source-of-truth is the directory, not archives)
+*.tar.gz
+*.tar.xz
+*.tar.zst
+*.zip
+*.iso
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Local Claude Code settings (contains personal permissions and local IPs)
+.claude/settings.local.json

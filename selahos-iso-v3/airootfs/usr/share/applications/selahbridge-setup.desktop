@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SelahBridge Setup
+Comment=Install Windows application compatibility
+Exec=pkexec /usr/local/bin/selahbridge-setup
+Icon=wine
+Terminal=false
+Categories=AudioVideo;Audio;System;

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=SelahBridge Installer
+GenericName=Windows Compatibility Installer
+Comment=Install Wine, DXVK, and WineASIO for Windows application support
+Exec=konsole --hold -e bash -c "sudo /usr/local/bin/selahbridge-install.sh"
+Icon=wine
+Terminal=false
+Categories=AudioVideo;Audio;System;
+Keywords=wine;dxvk;wineasio;windows;compatibility;selahbridge;

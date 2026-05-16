@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# selahbridge-init
+# Runs once per user on first login to initialize Wine prefix
+# and register WineASIO. Self-removes after completion.
+
+INIT_FLAG="$HOME/.config/selahos/selahbridge-initialized"
+
+# Already done — exit silently
+[ -f "$INIT_FLAG" ] && exit 0
+
+# Wait for desktop to be ready
+sleep 4
+
+mkdir -p "$HOME/.config/selahos"
+mkdir -p "$HOME/.config/pipewire"
+
+# PipeWire JACK config for this user
+cat > "$HOME/.config/pipewire/jack.conf" << 'JACK'
+context.properties = {
+    default.clock.rate = 48000
+    default.clock.quantum = 256
+    default.clock.min-quantum = 64
+    default.clock.max-quantum = 8192
+}
+JACK
+
+# Initialize Wine prefix silently
+export WINEPREFIX="$HOME/.wine"
+export WINEARCH=win64
+wineboot -i &>/dev/null
+
+# Set Windows 10 mode
+wine reg add 'HKEY_CURRENT_USER\Software\Wine' \
+    /v Version /t REG_SZ /d win10 /f &>/dev/null
+
+# Register WineASIO
+wine regsvr32 wineasio.dll &>/dev/null
+
+# Mark as done — won't run again
+touch "$INIT_FLAG"
+
+# Remove autostart entry so it never runs again
+rm -f "$HOME/.config/autostart/selahbridge-init.desktop"
