@@ -5,7 +5,7 @@
 # Copyright (C) 2026 Selah Technologies LLC
 # ============================================================
 
-set -e
+set -uo pipefail
 
 # ── Step 1: Create ALL groups before any useradd ─────────────
 # This prevents "group does not exist" errors during install
@@ -19,7 +19,7 @@ groupadd -r liveuser   2>/dev/null || true
 useradd -m \
     -G wheel,audio,video,network,input,autologin \
     -s /bin/bash \
-    liveuser
+    liveuser 2>/dev/null || true
 
 # Add optional groups separately (won't fail if group missing)
 for grp in bluetooth realtime storage sys lp; do
