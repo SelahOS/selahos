@@ -168,7 +168,15 @@ EOF
 
 # ── Step 17: Plymouth ────────────────────────────────────────
 command -v plymouth-set-default-theme &>/dev/null && \
-    plymouth-set-default-theme selah 2>/dev/null || \
-    plymouth-set-default-theme spinner 2>/dev/null || true
+    plymouth-set-default-theme selahos 2>/dev/null || \
+    plymouth-set-default-theme spinner  2>/dev/null || true
+
+# Ensure plymouth hook is present for the installed system's initramfs.
+# The live ISO uses archiso hooks (no plymouth); the installed system needs it.
+if [ -f /etc/mkinitcpio.conf ]; then
+    if ! grep -q 'plymouth' /etc/mkinitcpio.conf; then
+        sed -i 's/\budev\b/udev plymouth/' /etc/mkinitcpio.conf
+    fi
+fi
 
 echo "customize_airootfs.sh complete — SelahOS v1.0-beta"
