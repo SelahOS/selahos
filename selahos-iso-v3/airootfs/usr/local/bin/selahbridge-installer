@@ -1,0 +1,531 @@
+#!/usr/bin/env python3
+# ═══════════════════════════════════════════════════════════════════════════════
+#  selahbridge-installer — SelahBridge GUI Installer (Licensed Edition)
+#  PyQt6 application wrapper with 14-day trial and machine-ID license key
+#  Selah Technologies LLC — Copyright (C) 2026
+#
+#  Launch: pkexec /usr/local/bin/selahbridge-installer
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import sys, os, re, pwd, time, hashlib, subprocess
+from pathlib import Path
+
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QPushButton, QProgressBar, QTextEdit, QFrame, QLineEdit,
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QFont, QIcon, QPixmap
+
+# ── SelahOS color palette ─────────────────────────────────────────────────────
+C = {
+    'bg':     '#0B0F1A',
+    'bg2':    '#111827',
+    'gold':   '#D6A85A',
+    'parch':  '#EDE4D4',
+    'muted':  '#9A8D7B',
+    'teal':   '#8EC3B8',
+    'red':    '#B97A6F',
+    'border': '#2A3042',
+}
+
+STYLESHEET = f"""
+QMainWindow, QWidget {{
+    background-color: {C['bg']};
+    color: {C['parch']};
+    font-family: 'Noto Sans', sans-serif;
+}}
+QLabel {{ background: transparent; color: {C['parch']}; }}
+QPushButton {{
+    background-color: {C['gold']};
+    color: {C['bg']};
+    border: none;
+    border-radius: 4px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: bold;
+}}
+QPushButton:hover  {{ background-color: #E6C27A; }}
+QPushButton:disabled {{ background-color: {C['border']}; color: {C['muted']}; }}
+QProgressBar {{
+    background-color: {C['bg2']};
+    border: none;
+    border-radius: 3px;
+    height: 6px;
+    text-align: center;
+}}
+QProgressBar::chunk {{ background-color: {C['gold']}; border-radius: 3px; }}
+QTextEdit {{
+    background-color: {C['bg2']};
+    color: {C['muted']};
+    border: 1px solid {C['border']};
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px;
+}}
+QLineEdit {{
+    background-color: {C['bg2']};
+    color: {C['parch']};
+    border: 1px solid {C['border']};
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+}}
+QLineEdit:focus {{ border-color: {C['gold']}; }}
+"""
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  LICENSE / TRIAL
+# ═══════════════════════════════════════════════════════════════════════════════
+_P1, _P2, _P3 = "S3L4HT3", "CH2026X", "R7B3TA!"
+_SECRET     = _P1 + _P2 + _P3
+_TRIAL_DAYS = 14
+_LIC_DIR    = Path("/etc/selahbridge")
+_TRIAL_FILE = _LIC_DIR / "trial.conf"
+_LIC_FILE   = _LIC_DIR / "license"
+_SUPPORT    = "support@selahtechnologies.com"
+
+def _machine_id():
+    for p in ("/etc/machine-id", "/var/lib/dbus/machine-id"):
+        try:
+            return Path(p).read_text().strip()
+        except OSError:
+            pass
+    import socket
+    return hashlib.sha256(socket.gethostname().encode()).hexdigest()[:32]
+
+def _expected_key(mid=None):
+    mid = mid or _machine_id()
+    raw = hashlib.sha256(f"{mid}{_SECRET}".encode()).hexdigest()[:16].upper()
+    return f"SELAH-{raw[0:4]}-{raw[4:8]}-{raw[8:12]}-{raw[12:16]}"
+
+def _load_conf(path):
+    try:
+        return dict(
+            line.split('=', 1)
+            for line in Path(path).read_text().splitlines()
+            if '=' in line
+        )
+    except OSError:
+        return {}
+
+def _is_licensed():
+    d = _load_conf(_LIC_FILE)
+    return bool(d) and d.get('key', '').strip() == _expected_key()
+
+def _trial_status():
+    """Returns ('licensed'|'trial'|'new'|'expired', days_remaining)."""
+    if _is_licensed():
+        return 'licensed', 0
+    d = _load_conf(_TRIAL_FILE)
+    if not d:
+        return 'new', _TRIAL_DAYS
+    try:
+        elapsed  = int(time.time()) - int(d['trial_start'])
+        remaining = _TRIAL_DAYS - elapsed // 86400
+        return ('trial', remaining) if remaining > 0 else ('expired', 0)
+    except (KeyError, ValueError):
+        return 'expired', 0
+
+def _init_trial():
+    _LIC_DIR.mkdir(parents=True, exist_ok=True)
+    _TRIAL_FILE.write_text(
+        f"trial_start={int(time.time())}\nmachine_id={_machine_id()}\n"
+    )
+    _TRIAL_FILE.chmod(0o644)
+
+def _activate(key):
+    key = key.upper().replace(' ', '').strip()
+    if key != _expected_key():
+        return False
+    _LIC_DIR.mkdir(parents=True, exist_ok=True)
+    _LIC_FILE.write_text(
+        f"key={key}\nmachine_id={_machine_id()}\nactivated={int(time.time())}\n"
+    )
+    _LIC_FILE.chmod(0o600)
+    return True
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  INSTALLER WORKER
+# ═══════════════════════════════════════════════════════════════════════════════
+_ANSI  = re.compile(r'\033\[[0-9;]*[mGKHFABCDJ]|\033\].*?\007')
+_HDR   = re.compile(r'══\s+(.+?)\s+══')
+
+SECTION_PCT = {
+    "Detecting Distribution":   5,
+    "Multilib Repository":     12,
+    "Chaotic-AUR":             20,
+    "Syncing Databases":       28,
+    "System Update":           12,
+    "Prerequisites":           18,
+    "32-bit Architecture":     22,
+    "WineHQ Repository":       28,
+    "RPM Fusion":              20,
+    "Wine Staging":            40,
+    "Wine":                    40,
+    "DXVK":                    52,
+    "WineASIO":                60,
+    "32-bit Libraries":        68,
+    "Realtime Audio Limits":   73,
+    "User Groups":             78,
+    "PipeWire JACK":           82,
+    "Wine Prefix":             86,
+    "Wine Settings":           90,
+    "Firefox":                 93,
+    "Wine Browser Defaults":   96,
+    "WineASIO Registration":   98,
+}
+
+def _real_user():
+    for var in ('PKEXEC_UID', 'SUDO_UID'):
+        uid = os.environ.get(var)
+        if uid:
+            try:
+                return pwd.getpwuid(int(uid)).pw_name
+            except (KeyError, ValueError):
+                pass
+    return os.environ.get('SUDO_USER', os.environ.get('USER', 'user'))
+
+
+class InstallWorker(QThread):
+    progress = pyqtSignal(int, str)
+    log_line = pyqtSignal(str)
+    finished = pyqtSignal(bool, str)
+
+    SCRIPT = "/usr/local/bin/selahbridge-install.sh"
+
+    def run(self):
+        try:
+            env = os.environ.copy()
+            env['SUDO_USER'] = _real_user()
+            env['TERM'] = 'dumb'
+
+            proc = subprocess.Popen(
+                [self.SCRIPT],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                env=env,
+                bufsize=1,
+            )
+
+            for raw in proc.stdout:
+                line = _ANSI.sub('', raw).rstrip()
+                if not line:
+                    continue
+                self.log_line.emit(line)
+
+                m = _HDR.search(line)
+                if m:
+                    section = m.group(1).strip()
+                    pct = SECTION_PCT.get(section, -1)
+                    if pct >= 0:
+                        self.progress.emit(pct, section)
+
+            proc.wait()
+            if proc.returncode == 0:
+                self.progress.emit(100, "Complete")
+                self.finished.emit(True, _real_user())
+            else:
+                self.finished.emit(False, f"Installer exited with code {proc.returncode}")
+
+        except Exception as exc:
+            self.finished.emit(False, str(exc))
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  MAIN WINDOW
+# ═══════════════════════════════════════════════════════════════════════════════
+_ICON_PATHS = [
+    "/usr/share/icons/hicolor/256x256/apps/selahbridge.png",
+    "/usr/local/share/icons/selahbridge.png",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "selahbridge.png"),
+]
+
+def _find_icon():
+    for p in _ICON_PATHS:
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+class SelahBridgeInstaller(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("SelahBridge Installer")
+        self.setFixedSize(720, 620)
+
+        icon_path = _find_icon()
+        if icon_path:
+            self.setWindowIcon(QIcon(icon_path))
+
+        self._lic_status, self._lic_days = _trial_status()
+        if self._lic_status == 'new':
+            _init_trial()
+            self._lic_status, self._lic_days = 'trial', _TRIAL_DAYS
+
+        self._build_ui()
+        self._center()
+
+    def _center(self):
+        screen = QApplication.primaryScreen().geometry()
+        self.move(
+            (screen.width()  - self.width())  // 2,
+            (screen.height() - self.height()) // 2,
+        )
+
+    def _divider(self):
+        d = QFrame()
+        d.setFixedHeight(1)
+        d.setStyleSheet(f"background: {C['border']};")
+        return d
+
+    # ── UI construction ───────────────────────────────────────────────────────
+    def _build_ui(self):
+        root = QWidget()
+        self.setCentralWidget(root)
+        vl = QVBoxLayout(root)
+        vl.setContentsMargins(48, 36, 48, 36)
+        vl.setSpacing(14)
+
+        # Header: icon + title
+        hl = QHBoxLayout()
+        hl.setSpacing(16)
+        icon_path = _find_icon()
+        if icon_path:
+            px = QPixmap(icon_path).scaled(
+                56, 56,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            ico = QLabel()
+            ico.setPixmap(px)
+            ico.setFixedSize(56, 56)
+            hl.addWidget(ico)
+
+        title_col = QVBoxLayout()
+        title_col.setSpacing(2)
+        t = QLabel("SelahBridge™")
+        t.setFont(QFont('Noto Sans', 24, QFont.Weight.Light))
+        t.setStyleSheet(f"color: {C['gold']};")
+        title_col.addWidget(t)
+        sub = QLabel("Universal Installer  ·  Selah Technologies LLC")
+        sub.setFont(QFont('Noto Sans', 11))
+        sub.setStyleSheet(f"color: {C['muted']};")
+        title_col.addWidget(sub)
+        hl.addLayout(title_col)
+        hl.addStretch()
+        vl.addLayout(hl)
+        vl.addWidget(self._divider())
+
+        # License status panel
+        vl.addWidget(self._build_license_panel())
+        vl.addWidget(self._divider())
+
+        # Description (hidden once install starts)
+        self._desc = QLabel(
+            "This will install:\n"
+            "  •  Wine Staging  —  Windows application layer\n"
+            "  •  DXVK  —  DirectX to Vulkan translation\n"
+            "  •  WineASIO  —  Windows audio (ASIO) bridge\n"
+            "  •  32-bit Vulkan, PulseAudio, ALSA, PipeWire-JACK libraries\n"
+            "  •  Firefox (Windows) for app authorization (iLok, inMusic)\n\n"
+            "Requires an active internet connection · Takes 5–15 minutes."
+        )
+        self._desc.setFont(QFont('Noto Sans', 12))
+        self._desc.setStyleSheet(f"color: {C['parch']}; line-height: 1.7;")
+        vl.addWidget(self._desc)
+
+        # Status label
+        self._status_lbl = QLabel("Ready to install.")
+        self._status_lbl.setFont(QFont('Noto Sans', 12))
+        self._status_lbl.setStyleSheet(f"color: {C['teal']};")
+        vl.addWidget(self._status_lbl)
+
+        # Progress bar
+        self._bar = QProgressBar()
+        self._bar.setValue(0)
+        self._bar.setFixedHeight(6)
+        self._bar.setTextVisible(False)
+        vl.addWidget(self._bar)
+
+        # Log
+        self._log = QTextEdit()
+        self._log.setReadOnly(True)
+        self._log.setFixedHeight(150)
+        self._log.setPlaceholderText("Installation output will appear here…")
+        vl.addWidget(self._log)
+
+        # Install button
+        self._btn = QPushButton("Install SelahBridge")
+        self._btn.setFixedHeight(48)
+        self._btn.clicked.connect(self._on_install)
+        if self._lic_status == 'expired':
+            self._btn.setEnabled(False)
+        vl.addWidget(self._btn)
+
+        # Footer
+        foot = QLabel("SelahOS v3.0-beta  ·  selahtechnologies.com")
+        foot.setFont(QFont('Noto Sans', 10))
+        foot.setStyleSheet(f"color: {C['border']};")
+        foot.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        vl.addWidget(foot)
+
+    def _build_license_panel(self):
+        panel = QWidget()
+        vl = QVBoxLayout(panel)
+        vl.setContentsMargins(0, 4, 0, 4)
+        vl.setSpacing(8)
+
+        status = self._lic_status
+
+        if status == 'licensed':
+            lbl = QLabel("✓  Licensed — full access")
+            lbl.setFont(QFont('Noto Sans', 11))
+            lbl.setStyleSheet(f"color: {C['teal']};")
+            vl.addWidget(lbl)
+
+        elif status == 'trial':
+            lbl = QLabel(
+                f"Free trial  ·  {self._lic_days} of {_TRIAL_DAYS} days remaining  "
+                f"·  Purchase at selahtechnologies.com/selahbridge"
+            )
+            lbl.setFont(QFont('Noto Sans', 11))
+            lbl.setStyleSheet(f"color: {C['gold']};")
+            vl.addWidget(lbl)
+
+        elif status == 'expired':
+            mid = _machine_id()
+
+            exp = QLabel("⚠  Trial expired — license key required.")
+            exp.setFont(QFont('Noto Sans', 11, QFont.Weight.Bold))
+            exp.setStyleSheet(f"color: {C['red']};")
+            vl.addWidget(exp)
+
+            # Machine ID row (selectable for copy-paste)
+            mid_row = QHBoxLayout()
+            mid_row.setSpacing(8)
+            ml = QLabel("Machine ID:")
+            ml.setFont(QFont('Noto Sans', 11))
+            ml.setStyleSheet(f"color: {C['muted']};")
+            ml.setFixedWidth(90)
+            mid_row.addWidget(ml)
+            mv = QLabel(mid)
+            mv.setFont(QFont('JetBrains Mono', 11))
+            mv.setStyleSheet(f"color: {C['parch']};")
+            mv.setTextInteractionFlags(
+                Qt.TextInteractionFlag.TextSelectableByMouse
+            )
+            mid_row.addWidget(mv)
+            mid_row.addStretch()
+            vl.addLayout(mid_row)
+
+            info = QLabel(
+                f"Purchase at <b><span style='color:{C['gold']};'>"
+                f"selahtechnologies.com/selahbridge</span></b> then email your "
+                f"Machine ID to <b><span style='color:{C['gold']};'>{_SUPPORT}</span></b> "
+                f"to receive your key."
+            )
+            info.setFont(QFont('Noto Sans', 11))
+            info.setWordWrap(True)
+            vl.addWidget(info)
+
+            # Key entry row
+            key_row = QHBoxLayout()
+            key_row.setSpacing(8)
+            self._key_field = QLineEdit()
+            self._key_field.setPlaceholderText("SELAH-XXXX-XXXX-XXXX-XXXX")
+            self._key_field.returnPressed.connect(self._on_activate)
+            key_row.addWidget(self._key_field)
+            act = QPushButton("Activate")
+            act.setFixedWidth(110)
+            act.setFixedHeight(44)
+            act.clicked.connect(self._on_activate)
+            key_row.addWidget(act)
+            vl.addLayout(key_row)
+
+            self._act_msg = QLabel("")
+            self._act_msg.setFont(QFont('Noto Sans', 11))
+            vl.addWidget(self._act_msg)
+
+        return panel
+
+    # ── Slot: activate license ────────────────────────────────────────────────
+    def _on_activate(self):
+        key = self._key_field.text().strip()
+        if not key:
+            self._act_msg.setText("Enter your license key.")
+            self._act_msg.setStyleSheet(f"color: {C['red']};")
+            return
+        if _activate(key):
+            self._act_msg.setText("✓  Activated — you can now install SelahBridge.")
+            self._act_msg.setStyleSheet(f"color: {C['teal']};")
+            self._key_field.setEnabled(False)
+            self._btn.setEnabled(True)
+        else:
+            self._act_msg.setText(f"✗  Invalid key. Contact {_SUPPORT}")
+            self._act_msg.setStyleSheet(f"color: {C['red']};")
+
+    # ── Slot: begin install ───────────────────────────────────────────────────
+    def _on_install(self):
+        if os.geteuid() != 0:
+            self._status_lbl.setText(
+                "⚠  Root required.  Run:  pkexec selahbridge-installer"
+            )
+            self._status_lbl.setStyleSheet(f"color: {C['red']};")
+            return
+
+        self._btn.setEnabled(False)
+        self._btn.setText("Installing…")
+        self._desc.hide()
+        self._log.clear()
+
+        self._worker = InstallWorker()
+        self._worker.progress.connect(self._on_progress)
+        self._worker.log_line.connect(self._on_log)
+        self._worker.finished.connect(self._on_done)
+        self._worker.start()
+
+    def _on_progress(self, pct, section):
+        self._bar.setValue(pct)
+        self._status_lbl.setText(f"{section}…")
+
+    def _on_log(self, line):
+        self._log.append(line)
+        sb = self._log.verticalScrollBar()
+        sb.setValue(sb.maximum())
+
+    def _on_done(self, success, info):
+        if success:
+            self._bar.setValue(100)
+            self._status_lbl.setText(
+                "✓  SelahBridge installed. Log out and back in to activate audio groups."
+            )
+            self._status_lbl.setStyleSheet(f"color: {C['teal']};")
+            self._btn.setText("Done — Log Out and Back In")
+            self._log.append("\nPause. Reflect. Create.")
+        else:
+            self._status_lbl.setText(f"✗  {info}")
+            self._status_lbl.setStyleSheet(f"color: {C['red']};")
+            self._btn.setText("Retry")
+            self._btn.setEnabled(True)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName("SelahBridge Installer")
+
+    icon_path = _find_icon()
+    if icon_path:
+        app.setWindowIcon(QIcon(icon_path))
+
+    app.setStyleSheet(STYLESHEET)
+    win = SelahBridgeInstaller()
+    win.show()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()
