@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SelahOS Beta 1.0.1 Field Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&family=JetBrains+Mono&display=swap');
+
+  :root {
+    --bg: #0B0F1A;
+    --bg2: #0D1220;
+    --border: #1A2040;
+    --gold: #D6A85A;
+    --teal: #8EC3B8;
+    --parch: #EDE4D4;
+    --muted: #9A8D7B;
+    --red: #B97A6F;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--parch);
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  .cover {
+    text-align: center;
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .cover h1 {
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .cover h2 {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+
+  .cover .tagline {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .cover-table {
+    display: inline-block;
+    text-align: left;
+    margin-top: 24px;
+  }
+
+  .cover-table table {
+    border-collapse: collapse;
+    min-width: 400px;
+  }
+
+  .cover-table td {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .cover-table td:first-child {
+    color: var(--gold);
+    font-weight: 600;
+    background: var(--bg2);
+    width: 140px;
+  }
+
+  .cover-table td:last-child { background: var(--bg); }
+
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 32px;
+    margin-bottom: 48px;
+  }
+
+  .toc h2 { color: var(--gold); font-size: 18px; margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { padding: 5px 0; color: var(--teal); font-size: 14px; }
+  .toc a { color: var(--teal); text-decoration: none; }
+  .toc a:hover { color: var(--gold); }
+
+  /* GitHub repo banner */
+  .repo-banner {
+    background: var(--bg2);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 13px;
+    color: var(--parch);
+  }
+  .repo-banner strong { color: var(--gold); }
+  .repo-banner code {
+    color: var(--teal);
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  .section { margin-bottom: 56px; padding-top: 8px; }
+
+  h1.section-title {
+    font-size: 26px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h2.sub {
+    font-size: 17px;
+    color: var(--teal);
+    font-weight: 600;
+    margin: 20px 0 8px;
+  }
+
+  h3.subsub {
+    font-size: 14px;
+    color: var(--parch);
+    font-weight: 600;
+    margin: 14px 0 6px;
+  }
+
+  p { margin-bottom: 10px; }
+
+  ul { padding-left: 0; list-style: none; margin-bottom: 12px; }
+  ul li { padding: 4px 0 4px 20px; position: relative; }
+  ul li::before { content: "•"; color: var(--gold); position: absolute; left: 0; }
+
+  ol.checklist { padding-left: 0; list-style: none; margin-bottom: 12px; counter-reset: check; }
+  ol.checklist li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+    counter-increment: check;
+    border-bottom: 1px solid var(--border);
+  }
+  ol.checklist li::before {
+    content: counter(check);
+    color: var(--bg);
+    background: var(--gold);
+    font-weight: 700;
+    font-size: 11px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    top: 8px;
+  }
+
+  pre, code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+
+  pre {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 10px 0 16px;
+    overflow-x: auto;
+    color: var(--teal);
+    line-height: 1.6;
+  }
+
+  pre .comment { color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { background: var(--gold); color: #0B0F1A; font-weight: 700; padding: 10px 12px; text-align: left; }
+  td { padding: 9px 12px; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(odd) td { background: var(--bg2); }
+  tr:nth-child(even) td { background: var(--bg); }
+  td:first-child { color: var(--gold); font-weight: 500; }
+
+  .note {
+    background: var(--bg2);
+    border-left: 3px solid var(--gold);
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--muted);
+    border-radius: 0 4px 4px 0;
+  }
+  .note strong { color: var(--gold); }
+
+  .warn-box {
+    background: var(--bg2);
+    border: 1px solid var(--red);
+    border-left: 4px solid var(--red);
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--parch);
+    border-radius: 0 4px 4px 0;
+  }
+  .warn-box strong { color: var(--red); }
+
+  .success-box {
+    background: var(--bg2);
+    border: 1px solid var(--teal);
+    border-left: 4px solid var(--teal);
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--parch);
+    border-radius: 0 4px 4px 0;
+  }
+  .success-box strong { color: var(--teal); }
+
+  .badge-ok { color: var(--teal); font-weight: 600; }
+  .badge-warn { color: var(--gold); font-weight: 600; }
+  .badge-critical { color: var(--red); font-weight: 600; }
+  .badge-pending { color: var(--muted); font-weight: 600; }
+
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  footer .logo { color: var(--gold); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+
+  @media print {
+    body { background: white; color: black; }
+    pre { border: 1px solid #ccc; background: #f5f5f5; color: #333; }
+    .note { border-left: 3px solid #333; background: #f9f9f9; }
+    h1.section-title { color: #333; }
+    h2.sub { color: #555; }
+    footer { color: #666; }
+    .repo-banner { border: 1px solid #999; background: #f5f5f5; color: #333; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>SelahOS</h1>
+  <h2>Beta 1.0.1 — Field Guide</h2>
+  <p class="tagline">Pause. Reflect. Create.</p>
+  <div class="cover-table">
+    <table>
+      <tr><td>Version</td><td>Beta 1.0.1</td></tr>
+      <tr><td>Release Date</td><td>May 18, 2026</td></tr>
+      <tr><td>Kernel</td><td>linux-zen 7.0.9-zen1</td></tr>
+      <tr><td>Desktop</td><td>KDE Plasma 6.6.5 (Wayland)</td></tr>
+      <tr><td>Architecture</td><td>x86_64</td></tr>
+      <tr><td>Publisher</td><td>Selah Technologies LLC</td></tr>
+      <tr><td>Website</td><td>selahos.io</td></tr>
+      <tr><td>GitHub</td><td>github.com/SelahOS/selahos</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- GITHUB BANNER -->
+<div class="repo-banner">
+  <strong>📦 Official SelahOS Repository:</strong>
+  All scripts referenced in this guide are hosted at
+  <code>github.com/SelahOS/selahos</code> and run directly from GitHub.
+  Never run scripts from untrusted sources. Always verify the URL starts with
+  <code>https://raw.githubusercontent.com/SelahOS/selahos/main/</code>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#requirements">System Requirements</a></li>
+    <li><a href="#usb">Creating a Bootable USB</a></li>
+    <li><a href="#install">Boot &amp; Installation</a></li>
+    <li><a href="#firstboot">First Boot Checklist</a></li>
+    <li><a href="#postinstall">Post-Install Setup</a></li>
+    <li><a href="#selahbridge">SelahBridge Setup</a></li>
+    <li><a href="#issues">Known Issues &amp; Fixes</a></li>
+    <li><a href="#hardware">Hardware Compatibility</a></li>
+    <li><a href="#benchmarks">Benchmarks</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
+    <li><a href="#scripts">Field Scripts Reference</a></li>
+  </ol>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section" id="requirements">
+  <h1 class="section-title">1. System Requirements</h1>
+  <p>SelahOS Beta 1.0.1 is designed for x86_64 hardware with optimized support for Apple Intel Macs.</p>
+  <table>
+    <tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr>
+    <tr><td>CPU</td><td>Intel Core i3 (2nd gen+)</td><td>Intel Core i5/i7 (4th gen+)</td></tr>
+    <tr><td>RAM</td><td>4GB</td><td>8GB or more</td></tr>
+    <tr><td>Storage</td><td>30GB free</td><td>60GB+ SSD</td></tr>
+    <tr><td>Architecture</td><td>x86_64</td><td>x86_64</td></tr>
+    <tr><td>Boot</td><td>UEFI or BIOS</td><td>UEFI</td></tr>
+    <tr><td>Network</td><td>Required for SelahBridge</td><td>WiFi or Ethernet</td></tr>
+  </table>
+  <div class="note"><strong>Note:</strong> Apple Intel Macs from 2009 to 2020 are supported. Tested on MacBookPro9,2 (2012), MacBookPro14,1 (2017), and iMac16,2 (2015).</div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section" id="usb">
+  <h1 class="section-title">2. Creating a Bootable USB</h1>
+  <p>You will need a USB drive of at least 8GB. All data on the drive will be erased. Download the ISO from <strong>selahos.io/downloads</strong>.</p>
+
+  <h2 class="sub">On macOS</h2>
+  <p>Open Terminal. Use <code>diskutil list</code> to find your USB drive, then replace diskX below:</p>
+  <pre>diskutil list
+diskutil unmountDisk /dev/diskX
+sudo dd if=selahos-1.0.1-beta-x86_64.iso of=/dev/rdiskX bs=4m status=progress
+diskutil eject /dev/diskX</pre>
+
+  <h2 class="sub">On Linux</h2>
+  <pre>lsblk
+sudo dd if=selahos-1.0.1-beta-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync</pre>
+
+  <h2 class="sub">On Windows</h2>
+  <p>Use <strong>Rufus</strong> (rufus.ie) — select the ISO, choose GPT partition scheme, and write in DD Image mode.</p>
+  <div class="note"><strong>Note:</strong> Verify the SHA256 checksum matches the one posted at selahos.io/downloads before flashing.</div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" id="install">
+  <h1 class="section-title">3. Boot &amp; Installation</h1>
+
+  <h2 class="sub">Booting from USB</h2>
+  <ul>
+    <li>On Apple Intel Macs: Hold the <strong>Option key</strong> at startup, select the EFI Boot drive</li>
+    <li>On PC: Press F12, F2, or Del at startup to access boot menu</li>
+    <li>Select the SelahOS USB drive to boot the live environment</li>
+  </ul>
+
+  <h2 class="sub">Running the Installer</h2>
+  <ul>
+    <li>The installer launches automatically on first boot</li>
+    <li>Select your target disk — <strong>WARNING: this will erase the selected disk</strong></li>
+    <li>Enter your username, password, and hostname</li>
+    <li>Click Install — the process takes 10-20 minutes</li>
+    <li>When complete, the system will prompt you to reboot</li>
+  </ul>
+
+  <h2 class="sub">If the installer does not launch</h2>
+  <pre>sudo python3 /usr/local/bin/selahos-installer</pre>
+
+  <h2 class="sub">If the installer shows an error at the end</h2>
+  <div class="warn-box">
+    <strong>⚠ Important — Read This:</strong> In Beta 1.0.1, the installer may display
+    an unmount error or fail message at the very end of installation. <strong>This does not
+    mean the installation failed.</strong> The system files have already been written
+    successfully to disk before this step runs.
+  </div>
+  <div class="success-box">
+    <strong>✓ How to confirm your install succeeded:</strong> Reboot the machine. If SelahOS
+    boots and you reach the login screen, the installation completed successfully.
+    Proceed to the First Boot Checklist below to apply remaining components.
+  </div>
+  <p>To check the install log for details:</p>
+  <pre>cat /tmp/selahos-install.log | tail -50</pre>
+</div>
+
+<!-- SECTION 4 — FIRST BOOT CHECKLIST -->
+<div class="section" id="firstboot">
+  <h1 class="section-title">4. First Boot Checklist</h1>
+  <p>Follow these steps in order after your first successful boot into SelahOS. Each step builds on the previous one.</p>
+
+  <ol class="checklist">
+    <li>
+      <strong>Connect to the internet</strong><br>
+      Open the network icon in the taskbar and connect to WiFi or plug in Ethernet.
+      Internet is required for all remaining steps.
+    </li>
+    <li>
+      <strong>Open Konsole (Terminal)</strong><br>
+      Right-click the desktop → Open Terminal, or find Konsole in the app launcher.
+    </li>
+    <li>
+      <strong>Run the Post-Install Fix script</strong><br>
+      This fixes mirrors, kdesu, multilib, theme, and launchers in one shot.
+      <pre>curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-postinstall-fix.sh | sudo bash</pre>
+    </li>
+    <li>
+      <strong>Log out and back in</strong><br>
+      Click the application menu → Leave → Log Out. Log back in with your credentials.
+      This activates all permission and theme changes.
+    </li>
+    <li>
+      <strong>Install SelahBridge</strong><br>
+      Open Konsole again and run:
+      <pre>curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selahbridge-install.sh | sudo bash</pre>
+    </li>
+    <li>
+      <strong>Log out and back in again</strong><br>
+      Required to activate SelahBridge audio group permissions.
+    </li>
+    <li>
+      <strong>Run the system audit (optional but recommended)</strong><br>
+      Confirms everything is working correctly.
+      <pre>curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-audit.sh | sudo bash</pre>
+    </li>
+    <li>
+      <strong>Launch your first Windows application</strong><br>
+      Open SelahBridge from the app launcher and enjoy.
+    </li>
+  </ol>
+
+  <div class="note"><strong>Note:</strong> All scripts are pulled directly from <code>github.com/SelahOS/selahos</code>. You must have an active internet connection to run them.</div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section" id="postinstall">
+  <h1 class="section-title">5. Post-Install Setup</h1>
+  <p>The post-install fix script is the most important thing to run after a fresh install. It corrects all known Beta 1.0 issues automatically.</p>
+
+  <h2 class="sub">Run from GitHub</h2>
+  <pre><span class="comment"># From github.com/SelahOS/selahos</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-postinstall-fix.sh | sudo bash</pre>
+
+  <h2 class="sub">What it fixes</h2>
+  <ul>
+    <li>Installs kdesu — required for application launchers on Wayland</li>
+    <li>Enables multilib repository — required for SelahBridge</li>
+    <li>Updates package mirrors for reliable downloads</li>
+    <li>Synchronizes package databases</li>
+    <li>Applies the Selah color scheme to your user profile</li>
+    <li>Applies hardware stability fixes for Apple Intel machines</li>
+    <li>Fixes all desktop launcher files (pkexec → kdesu)</li>
+  </ul>
+  <p>After the script completes, <strong>log out and back in</strong> to activate all changes.</p>
+
+  <h2 class="sub">Full System Audit</h2>
+  <p>Report only — shows what needs fixing:</p>
+  <pre><span class="comment"># From github.com/SelahOS/selahos</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-audit.sh | sudo bash</pre>
+  <p>Auto-fix mode — repairs all detected issues:</p>
+  <pre><span class="comment"># From github.com/SelahOS/selahos</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-audit.sh | sudo bash -s -- --fix</pre>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section" id="selahbridge">
+  <h1 class="section-title">6. SelahBridge Setup</h1>
+  <p>SelahBridge is SelahOS's proprietary Windows application compatibility layer. It enables Windows creative software — including professional DAWs and music production tools — to run natively on SelahOS.</p>
+
+  <h2 class="sub">Installing via GUI</h2>
+  <ul>
+    <li>Open the Application Launcher</li>
+    <li>Search for <strong>SelahBridge Setup</strong></li>
+    <li>Click Install — the process takes 5-15 minutes</li>
+    <li>Log out and back in when prompted</li>
+  </ul>
+
+  <h2 class="sub">Installing via Console (Recommended for Beta)</h2>
+  <p>Run directly from the official GitHub repository:</p>
+  <pre><span class="comment"># From github.com/SelahOS/selahos</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selahbridge-install.sh | sudo bash</pre>
+
+  <div class="note"><strong>Note:</strong> Make sure you have run selah-postinstall-fix.sh first. If mirrors are not configured, SelahBridge installation will fail.</div>
+
+  <h2 class="sub">Confirmed Working Applications</h2>
+  <ul>
+    <li>InMusic Software Center — installs via SelahBridge, authorize with Falkon browser ✓</li>
+    <li>Additional DAWs and creative tools — in active testing</li>
+  </ul>
+
+  <div class="note"><strong>Note:</strong> After SelahBridge installation, always log out and back in before launching Windows applications. This activates audio group permissions.</div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section" id="issues">
+  <h1 class="section-title">7. Known Issues &amp; Fixes</h1>
+  <table>
+    <tr><th>Issue</th><th>Severity</th><th>Fix</th></tr>
+    <tr>
+      <td>Installer shows error or fails at end — but system boots</td>
+      <td><span class="badge-warn">Low</span></td>
+      <td>Installation completed successfully. Reboot and run selah-postinstall-fix.sh on first boot to apply remaining components</td>
+    </tr>
+    <tr>
+      <td>Unmount warning at end of installation</td>
+      <td><span class="badge-ok">Cosmetic</span></td>
+      <td>Safe to ignore — reboot normally</td>
+    </tr>
+    <tr>
+      <td>iMac random reboots</td>
+      <td><span class="badge-warn">Medium</span></td>
+      <td>Run selah-postinstall-fix.sh — blacklists watchdog automatically</td>
+    </tr>
+    <tr>
+      <td>iMac display icons missing or blurry</td>
+      <td><span class="badge-ok">Low</span></td>
+      <td>Run: kscreen-doctor output.1.scale.2</td>
+    </tr>
+    <tr>
+      <td>SelahBridge fails — mirror error</td>
+      <td><span class="badge-critical">High</span></td>
+      <td>Run selah-postinstall-fix.sh first, then retry SelahBridge installer from GitHub</td>
+    </tr>
+    <tr>
+      <td>App launchers open password prompt then close</td>
+      <td><span class="badge-critical">High</span></td>
+      <td>Run selah-postinstall-fix.sh to fix all launchers automatically</td>
+    </tr>
+    <tr>
+      <td>Theme appears as default Breeze after install</td>
+      <td><span class="badge-warn">Medium</span></td>
+      <td>Run selah-postinstall-fix.sh to apply Selah theme</td>
+    </tr>
+    <tr>
+      <td>fastfetch not showing after install</td>
+      <td><span class="badge-ok">Low</span></td>
+      <td>sudo pacman -S fastfetch</td>
+    </tr>
+    <tr>
+      <td>kdesu missing — GUI tools won't launch</td>
+      <td><span class="badge-critical">High</span></td>
+      <td>Run selah-postinstall-fix.sh — installs kdesu automatically</td>
+    </tr>
+  </table>
+
+  <div class="note">
+    <strong>Quick fix for most issues:</strong> The majority of Beta 1.0.1 known issues
+    are resolved by running the post-install fix script from GitHub:<br><br>
+    <code>curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-postinstall-fix.sh | sudo bash</code>
+  </div>
+</div>
+
+<!-- SECTION 8 -->
+<div class="section" id="hardware">
+  <h1 class="section-title">8. Hardware Compatibility</h1>
+  <p>SelahOS Beta 1.0.1 has been tested on the following Apple Intel machines. All machines ran SelahOS successfully with SelahBridge functional.</p>
+  <table>
+    <tr><th>Machine</th><th>Model ID</th><th>CPU</th><th>RAM</th><th>Status</th></tr>
+    <tr>
+      <td>MacBook Pro 13" (2017)</td>
+      <td>MacBookPro14,1</td>
+      <td>i5-7360U</td>
+      <td>8GB</td>
+      <td><span class="badge-ok">✓ Fully Working</span></td>
+    </tr>
+    <tr>
+      <td>MacBook Pro 13" (2012)</td>
+      <td>MacBookPro9,2</td>
+      <td>i5-3210M</td>
+      <td>8GB</td>
+      <td><span class="badge-ok">✓ Fully Working</span></td>
+    </tr>
+    <tr>
+      <td>iMac 21.5" (2015)</td>
+      <td>iMac16,2</td>
+      <td>i5-5675R</td>
+      <td>8GB</td>
+      <td><span class="badge-ok">✓ Working*</span></td>
+    </tr>
+    <tr>
+      <td>Mac Pro 4,1→5,1</td>
+      <td>MacPro5,1</td>
+      <td>Xeon</td>
+      <td>Up to 128GB</td>
+      <td><span class="badge-pending">⏳ Testing</span></td>
+    </tr>
+  </table>
+  <div class="note"><strong>* iMac16,2:</strong> Apply watchdog fix and set display scaling to 2x for best experience. Spinning HDD reduces performance — SSD upgrade recommended.</div>
+</div>
+
+<!-- SECTION 9 -->
+<div class="section" id="benchmarks">
+  <h1 class="section-title">9. Benchmarks</h1>
+  <p>Geekbench 6 results comparing SelahOS Beta 1.0.1 against macOS on the same hardware. SelahOS outperforms macOS on single-core across every tested machine.</p>
+  <table>
+    <tr><th>Machine</th><th>OS</th><th>Single-Core</th><th>Multi-Core</th><th>SC Delta</th></tr>
+    <tr>
+      <td>iMac16,2 (2015) i5-5675R</td>
+      <td>SelahOS Beta 1.0.1</td>
+      <td>1,264</td><td>2,859</td>
+      <td><span class="badge-ok">+8.3%</span></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>macOS avg (552 results)</td>
+      <td>1,167</td><td>3,433</td>
+      <td>baseline</td>
+    </tr>
+    <tr>
+      <td>MacBookPro14,1 (2017) i5-7360U</td>
+      <td>SelahOS Beta 1.0.1</td>
+      <td>1,268</td><td>2,781</td>
+      <td><span class="badge-ok">+15.8%</span></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>macOS avg (8,348 results)</td>
+      <td>1,095</td><td>2,298</td>
+      <td>baseline</td>
+    </tr>
+    <tr>
+      <td>MacBookPro9,2 (2012) i5-3210M</td>
+      <td>SelahOS Beta 1.0.1</td>
+      <td>575</td><td>1,157</td>
+      <td><span class="badge-ok">+5.3%</span></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>macOS avg (240 results)</td>
+      <td>546</td><td>1,090</td>
+      <td>baseline</td>
+    </tr>
+  </table>
+  <div class="note"><strong>Headline:</strong> MacBookPro14,1 delivers +15.8% single-core and +21.0% multi-core performance over macOS on the same hardware running SelahOS.</div>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section" id="troubleshooting">
+  <h1 class="section-title">10. Troubleshooting</h1>
+
+  <h2 class="sub">Most issues — run this first</h2>
+  <pre><span class="comment"># From github.com/SelahOS/selahos — fixes most known Beta 1.0.1 issues</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-postinstall-fix.sh | sudo bash</pre>
+
+  <h2 class="sub">No WiFi after install</h2>
+  <pre>sudo pacman -S broadcom-wl-dkms
+sudo modprobe wl</pre>
+
+  <h2 class="sub">Black screen after boot</h2>
+  <pre>sudo systemctl restart sddm</pre>
+
+  <h2 class="sub">Audio not working</h2>
+  <pre>systemctl --user restart pipewire wireplumber
+groups $USER   <span class="comment"># should include: audio realtime</span></pre>
+  <p>Or run the full audit and auto-fix from GitHub:</p>
+  <pre><span class="comment"># From github.com/SelahOS/selahos</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-audit.sh | sudo bash -s -- --fix</pre>
+
+  <h2 class="sub">SelahBridge fails to install</h2>
+  <pre><span class="comment"># Step 1 — fix mirrors first (from github.com/SelahOS/selahos)</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-postinstall-fix.sh | sudo bash
+
+<span class="comment"># Step 2 — retry SelahBridge (from github.com/SelahOS/selahos)</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selahbridge-install.sh | sudo bash</pre>
+
+  <h2 class="sub">Fix mirrors manually</h2>
+  <pre>sudo tee /etc/pacman.d/mirrorlist &lt;&lt; 'EOF'
+Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
+Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch
+EOF
+sudo pacman -Sy</pre>
+
+  <h2 class="sub">Check install log</h2>
+  <pre>cat /tmp/selahos-install.log | tail -50</pre>
+</div>
+
+<!-- SECTION 11 -->
+<div class="section" id="scripts">
+  <h1 class="section-title">11. Field Scripts Reference</h1>
+  <p>All scripts are hosted at <strong>github.com/SelahOS/selahos</strong> and run directly from GitHub. Always use the full URL shown below to ensure you are running the official version.</p>
+
+  <div class="warn-box">
+    <strong>⚠ Security:</strong> Only run scripts from
+    <code>https://raw.githubusercontent.com/SelahOS/selahos/main/</code>
+    — never from unknown sources.
+  </div>
+
+  <h2 class="sub">1. Post-Install Fix</h2>
+  <p><strong>When to use:</strong> Immediately after first boot. Fixes all known Beta 1.0 issues.</p>
+  <pre><span class="comment"># github.com/SelahOS/selahos — selah-postinstall-fix.sh</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-postinstall-fix.sh | sudo bash</pre>
+
+  <h2 class="sub">2. SelahBridge Console Installer</h2>
+  <p><strong>When to use:</strong> After running post-install fix. Installs the compatibility layer securely.</p>
+  <pre><span class="comment"># github.com/SelahOS/selahos — selahbridge-install.sh</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selahbridge-install.sh | sudo bash</pre>
+
+  <h2 class="sub">3. System Audit — Report Only</h2>
+  <p><strong>When to use:</strong> Any time something feels wrong. Shows a full diagnostic without changing anything.</p>
+  <pre><span class="comment"># github.com/SelahOS/selahos — selah-audit.sh</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-audit.sh | sudo bash</pre>
+
+  <h2 class="sub">4. System Audit — Auto-Fix</h2>
+  <p><strong>When to use:</strong> When the report shows issues you want repaired automatically.</p>
+  <pre><span class="comment"># github.com/SelahOS/selahos — selah-audit.sh --fix</span>
+curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selah-audit.sh | sudo bash -s -- --fix</pre>
+
+  <div class="note">
+    <strong>Recommended order for a fresh install:</strong><br>
+    1. selah-postinstall-fix.sh → Log out/in → 2. selahbridge-install.sh → Log out/in → 3. selah-audit.sh (confirm all good)
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">SelahOS</div>
+  <p>Selah Technologies LLC &nbsp;|&nbsp; selahos.io &nbsp;|&nbsp; github.com/SelahOS/selahos</p>
+  <p>Bedford-Stuyvesant, Brooklyn, New York &nbsp;|&nbsp; May 2026</p>
+  <p style="margin-top:8px;">SelahOS and SelahBridge are trademarks of Selah Technologies LLC. Built on Arch Linux with the linux-zen kernel.</p>
+  <p style="margin-top:12px; font-style:italic; color:#555;">Thank you for being an early believer in SelahOS.<br>Your feedback, testing, and support make this possible.</p>
+</footer>
+
+</body>
+</html>
