@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SelahOS — Linux for Music Producers & Creative Professionals</title>
+<meta name="description" content="SelahOS is a creator-first Linux distribution for musicians and producers. Run Windows DAWs and creative software on Linux. Free download. Optimized for Apple Intel Macs 2009-2020.">
+<meta name="keywords" content="Linux music production, DAW on Linux, Windows DAW Linux, Ableton Linux, FL Studio Linux, Pro Tools Linux, music production OS, Linux for musicians, Apple Mac Linux, SelahOS, creative Linux distro, ASIO Linux, pro audio Linux, Arch Linux audio, old Mac Linux, MacBook Linux">
+<meta name="author" content="Selah Technologies LLC">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://selahos.io">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://selahos.io">
+<meta property="og:title" content="SelahOS — Run Windows DAWs on Linux. Free Download.">
+<meta property="og:description" content="SelahOS enables musicians and producers to run Windows creative software on Linux. Built on Arch Linux with the zen kernel. Optimized for Apple Intel Macs. Free beta download available now.">
+<meta property="og:image" content="https://selahos.io/og-image.png">
+<meta property="og:site_name" content="SelahOS">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@selahos">
+<meta name="twitter:title" content="SelahOS — Linux for Creators. Run Your Windows DAWs.">
+<meta name="twitter:description" content="Run Windows DAWs and creative software on Linux. Free beta download. Built for musicians, producers, and creators.">
+<meta name="twitter:image" content="https://selahos.io/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #080C18;
+    --bg2:      #0D1220;
+    --bg3:      #131929;
+    --gold:     #C9974A;
+    --gold-lt:  #DEB96E;
+    --parch:    #EDE4D4;
+    --parch-dim:#B8AD9E;
+    --muted:    #6B6357;
+    --border:   #1E2535;
+    --teal:     #7DADA3;
+    --amber:    #C9974A;
+    --warn:     #BF7A3A;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--parch);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Navigation ─────────────────────────────────────────── */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 24px;
+    background: rgba(8,12,24,0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .nav-links a {
+    color: var(--parch-dim);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover { color: var(--parch); }
+
+  /* ── Hamburger button ───────────────────────────────────── */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .nav-hamburger span {
+    display: block;
+    width: 18px;
+    height: 1px;
+    background: var(--parch-dim);
+    transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+    transform-origin: center;
+  }
+
+  .nav-hamburger.open span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .nav-hamburger.open span:nth-child(2) {
+    opacity: 0;
+    width: 0;
+  }
+  .nav-hamburger.open span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* ── Mobile menu overlay ────────────────────────────────── */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(8,12,24,0.98);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(16px);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .mobile-menu.open {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-menu-links {
+    list-style: none;
+    text-align: center;
+  }
+
+  .mobile-menu-links li {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-menu-links li:first-child {
+    border-top: 1px solid var(--border);
+  }
+
+  .mobile-menu-links a {
+    display: block;
+    padding: 22px 48px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--parch-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .mobile-menu-links a:hover {
+    color: var(--gold);
+    background: rgba(201,151,74,0.04);
+  }
+
+  /* ── Hero ───────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 30%,
+        rgba(201, 151, 74, 0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%,
+        rgba(125, 173, 163, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.2s forwards;
+  }
+
+  .hero-wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(72px, 14vw, 160px);
+    font-weight: 300;
+    letter-spacing: 20px;
+    color: var(--parch);
+    line-height: 1;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 1.2s ease 0.4s forwards;
+    text-indent: 20px;
+  }
+
+  .hero-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 3vw, 24px);
+    font-style: italic;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.6s forwards;
+  }
+
+  .hero-divider {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, var(--border), transparent);
+    margin: 0 auto 48px;
+    opacity: 0;
+    animation: fadeIn 1s ease 0.8s forwards;
+  }
+
+  .hero-statement {
+    max-width: 560px;
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--parch-dim);
+    line-height: 1.8;
+    margin: 0 auto 56px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+
+  .btn-primary {
+    padding: 14px 36px;
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { background: var(--gold-lt); }
+
+  .btn-secondary {
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--parch-dim);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover {
+    color: var(--parch);
+    border-color: var(--muted);
+  }
+
+  .btn-ghost {
+    padding: 12px 28px;
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(201, 151, 74, 0.08);
+  }
+
+  /* ── Section base ───────────────────────────────────────── */
+  section { padding: 120px 24px; scroll-margin-top: 64px; }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--parch);
+    margin-bottom: 24px;
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--parch-dim);
+    max-width: 560px;
+    line-height: 1.9;
+  }
+
+  /* ── Why section ────────────────────────────────────────── */
+  .why {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 64px;
+  }
+
+  .why-text p {
+    font-size: 16px;
+    color: var(--parch-dim);
+    line-height: 1.9;
+    margin-bottom: 20px;
+  }
+
+  .why-quote {
+    padding: 40px;
+    border-left: 2px solid var(--gold);
+    background: var(--bg3);
+  }
+
+  .why-quote blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 3vw, 32px);
+    font-style: italic;
+    color: var(--parch);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .why-quote cite {
+    display: block;
+    margin-top: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-style: normal;
+  }
+
+  /* ── Pillars ────────────────────────────────────────────── */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2px;
+    margin-top: 64px;
+    border: 1px solid var(--border);
+  }
+
+  .pillar {
+    padding: 48px 40px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+
+  .pillar:hover { background: var(--bg3); }
+  .pillar:last-child { border-right: none; }
+
+  .pillar-icon {
+    width: 40px;
+    height: 2px;
+    background: var(--gold);
+    margin-bottom: 32px;
+  }
+
+  .pillar h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 16px;
+  }
+
+  .pillar p {
+    font-size: 14px;
+    color: var(--parch-dim);
+    line-height: 1.8;
+  }
+
+  /* ── Screenshots ────────────────────────────────────────── */
+  .screenshots {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 64px;
+  }
+
+  .screenshot-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: default;
+  }
+
+  .screenshot-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-3px);
+  }
+
+  .screenshot-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg);
+  }
+
+  .screenshot-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .screenshot-card:hover .screenshot-img-wrap img {
+    transform: scale(1.03);
+  }
+
+  .screenshot-label {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .screenshot-label h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 6px;
+  }
+
+  .screenshot-label p {
+    font-size: 13px;
+    color: var(--parch-dim);
+    line-height: 1.6;
+  }
+
+  /* ── Beta Status ────────────────────────────────────────── */
+  .beta {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .beta-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 64px;
+  }
+
+  .beta-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s ease infinite;
+  }
+
+  .beta-items {
+    list-style: none;
+    margin-top: 32px;
+  }
+
+  .beta-items li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--parch-dim);
+  }
+
+  .beta-items li:last-child { border-bottom: none; }
+
+  .item-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .status-done { background: var(--teal); }
+  .status-wip  { background: var(--gold); }
+  .status-next { background: var(--muted); }
+
+  .beta-honesty {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 40px;
+  }
+
+  .beta-honesty h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 20px;
+  }
+
+  .beta-honesty p {
+    font-size: 15px;
+    color: var(--parch-dim);
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+
+  /* ── Download ───────────────────────────────────────────── */
+  .download {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .download-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 64px;
+  }
+
+  .download-box {
+    border: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .download-box-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .download-filename {
+    font-family: 'DM Sans', monospace;
+    font-size: 13px;
+    color: var(--parch);
+    letter-spacing: 0.5px;
+  }
+
+  .download-size {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .download-box-body {
+    padding: 32px;
+  }
+
+  .sha-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    margin-bottom: 28px;
+  }
+
+  .sha-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .sha-value {
+    font-family: 'DM Sans', monospace;
+    font-size: 12px;
+    color: var(--parch-dim);
+    word-break: break-all;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .download-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .download-note {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .download-note strong {
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .known-issues {
+    padding-top: 8px;
+  }
+
+  .known-issues h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 8px;
+  }
+
+  .known-issues .subtitle {
+    font-size: 14px;
+    color: var(--parch-dim);
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  .issue-list {
+    list-style: none;
+  }
+
+  .issue-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .issue-list li:last-child { border-bottom: none; }
+
+  .issue-severity {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .sev-active {
+    background: rgba(191,122,58,0.15);
+    color: var(--warn);
+    border: 1px solid rgba(191,122,58,0.3);
+  }
+
+  .sev-minor {
+    background: rgba(107,99,87,0.2);
+    color: var(--muted);
+    border: 1px solid rgba(107,99,87,0.3);
+  }
+
+  .sev-known {
+    background: rgba(125,173,163,0.1);
+    color: var(--teal);
+    border: 1px solid rgba(125,173,163,0.25);
+  }
+
+  .issue-text {
+    color: var(--parch-dim);
+    line-height: 1.7;
+  }
+
+  .issue-text strong {
+    color: var(--parch);
+    font-weight: 400;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ── Founder Vision ─────────────────────────────────────── */
+  .founder {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .founder-inner {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 80px;
+    align-items: start;
+    margin-top: 64px;
+  }
+
+  .founder-body p {
+    font-size: 16px;
+    color: var(--parch-dim);
+    line-height: 1.95;
+    margin-bottom: 24px;
+  }
+
+  .founder-pull-quote {
+    padding: 36px 0 36px 32px;
+    border-left: 2px solid var(--gold);
+    margin: 40px 0;
+  }
+
+  .founder-pull-quote p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-style: italic;
+    color: var(--parch) !important;
+    line-height: 1.5 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .founder-sidebar {
+    padding-top: 8px;
+  }
+
+  .founder-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 40px;
+    margin-bottom: 24px;
+  }
+
+  .founder-card .role {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .founder-card .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 6px;
+  }
+
+  .founder-card .company {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .founder-stack {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 32px 40px;
+  }
+
+  .founder-stack h4 {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .founder-stack ul {
+    list-style: none;
+  }
+
+  .founder-stack ul li {
+    font-size: 13px;
+    color: var(--parch-dim);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .founder-stack ul li:last-child { border-bottom: none; }
+
+  .founder-stack ul li::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ── Ko-fi / Support ────────────────────────────────────── */
+  .support {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .support-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .support-inner .section-label { display: block; }
+
+  .support-body {
+    margin-top: 48px;
+  }
+
+  .support-body p {
+    font-size: 16px;
+    color: var(--parch-dim);
+    line-height: 1.9;
+    margin-bottom: 20px;
+  }
+
+  .support-body p em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--parch);
+  }
+
+  .support-cta {
+    margin-top: 48px;
+    padding: 40px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .support-cta p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 20px;
+    line-height: 1.7;
+  }
+
+  .kofi-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .kofi-btn:hover {
+    background: rgba(201,151,74,0.08);
+  }
+
+  .kofi-icon {
+    font-size: 16px;
+  }
+
+  /* ── Download / Access ──────────────────────────────────── */
+  .access {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .access-box {
+    max-width: 560px;
+    margin: 64px auto 0;
+    padding: 60px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .access-box h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--parch);
+    margin-bottom: 16px;
+  }
+
+  .access-box p {
+    font-size: 15px;
+    color: var(--parch-dim);
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+
+  .access-note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Footer ─────────────────────────────────────────────── */
+  footer {
+    padding: 80px 48px 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 80px;
+    margin-bottom: 64px;
+    padding-bottom: 64px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-brand-block .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .footer-brand-block .footer-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    font-style: italic;
+  }
+
+  .footer-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+
+  .footer-nav-col h4 {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .footer-nav-col ul {
+    list-style: none;
+  }
+
+  .footer-nav-col ul li {
+    margin-bottom: 12px;
+  }
+
+  .footer-nav-col ul li a {
+    font-size: 13px;
+    color: var(--parch-dim);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.3s;
+  }
+
+  .footer-nav-col ul li a:hover {
+    color: var(--parch);
+  }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .footer-legal {
+    font-size: 11px;
+    color: var(--border);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Animations ─────────────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Responsive ─────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .site-nav { padding: 16px 32px; }
+    .nav-links { gap: 20px; }
+  }
+
+  @media (max-width: 900px) {
+    .download-inner,
+    .founder-inner { grid-template-columns: 1fr; gap: 48px; }
+    .footer-top { grid-template-columns: 1fr; gap: 48px; }
+    .footer-nav { grid-template-columns: repeat(2, 1fr); }
+    .nav-links { gap: 14px; }
+    .nav-links a { font-size: 11px; }
+  }
+
+  @media (max-width: 768px) {
+    .site-nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .hero { padding-top: 100px; }
+    .why-grid, .beta-inner { grid-template-columns: 1fr; gap: 48px; }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .pillar { border-right: none; border-bottom: 1px solid var(--border); }
+    .screenshots-grid { grid-template-columns: 1fr; }
+    .access-box { padding: 40px 24px; }
+    footer { padding: 60px 24px 40px; }
+    .footer-nav { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; }
+  }
+</style>
+<script async src=/analytics/script.js data-website-id=2ebc0e78-e572-47e9-94f9-9835c3779da7></script>
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SelahOS",
+  "operatingSystem": "Linux",
+  "applicationCategory": "OperatingSystem",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Creator-first Linux distribution for musicians and producers. Enables Windows DAW compatibility on Linux via SelahBridge. Optimized for Apple Intel Macs.",
+  "url": "https://selahos.io",
+  "author": {
+    "@type": "Organization",
+    "name": "Selah Technologies LLC",
+    "url": "https://selahos.io"
+  },
+  "downloadUrl": "https://selahos.io/downloads/selahos-1.0.0-beta-2026.05.18-x86_64.iso",
+  "softwareVersion": "1.0.1-beta",
+  "releaseNotes": "Beta 1.0.1 — Tested on Apple Intel Macs 2009-2020"
+}
+</script>
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="site-nav">
+  <a href="#" class="nav-logo">SelahOS</a>
+  <ul class="nav-links">
+    <li><a href="#why">Philosophy</a></li>
+    <li><a href="#pillars">Pillars</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
+    <li><a href="#beta">Beta</a></li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="#founder">Vision</a></li>
+    <li><a href="#support">Support</a></li>
+    <li><a href="/docs/">Docs</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" aria-hidden="true">
+  <ul class="mobile-menu-links">
+    <li><a href="#why">Philosophy</a></li>
+    <li><a href="#pillars">Pillars</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
+    <li><a href="#beta">Beta</a></li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="#founder">Vision</a></li>
+    <li><a href="#support">Support</a></li>
+    <li><a href="/docs/">Docs</a></li>
+  </ul>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <p class="hero-eyebrow">Selah Technologies LLC · v1.0-beta</p>
+  <h1 class="hero-wordmark">SELAH</h1>
+  <p class="hero-tagline">Pause. Reflect. Create.</p>
+  <div class="hero-divider"></div>
+  <p class="hero-statement">
+    Technology should adapt to humans —<br>
+    not force humans to adapt to machines.
+  </p>
+  <div class="hero-actions">
+    <a href="#download" class="btn-primary">Download Beta</a>
+    <a href="#why" class="btn-secondary">Learn More</a>
+  </div>
+</section>
+
+<!-- Why SelahOS -->
+<section class="why" id="why">
+  <div class="section-inner">
+    <p class="section-label reveal">Philosophy</p>
+    <h2 class="section-title reveal">Why SelahOS exists.</h2>
+
+    <div class="why-grid">
+      <div class="why-text reveal">
+        <p>
+          Most operating systems are built for hardware cycles,
+          enterprise workflows, or generalized computing. They
+          interrupt. They distract. They demand attention at the
+          worst possible moments.
+        </p>
+        <p>
+          SelahOS was built around a different premise: that the
+          space between an idea and its execution should be as
+          frictionless as possible. That your tools should create
+          space for you — not consume it.
+        </p>
+        <p>
+          The name comes from a Hebrew word found throughout
+          the ancient Psalms. Selah. It means: pause, reflect,
+          consider. We built an operating system around that idea.
+        </p>
+        <p>
+          A creator-first Linux distribution focused on calm
+          workflows, hardware longevity, and reducing the distance
+          between thought and creation.
+        </p>
+      </div>
+      <div class="why-quote reveal">
+        <blockquote>
+          "Older machines still deserve usefulness, dignity,
+          and creative possibility."
+        </blockquote>
+        <cite>SelahOS Design Principle</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pillars -->
+<section id="pillars">
+  <div class="section-inner">
+    <p class="section-label reveal">Core Pillars</p>
+    <h2 class="section-title reveal">Built around what creators actually need.</h2>
+
+    <div class="pillars-grid">
+      <div class="pillar reveal">
+        <div class="pillar-icon"></div>
+        <h3>Creator-First</h3>
+        <p>Reduce friction between thought and execution. Every default, every setting, every included application chosen with the creator in mind.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-icon"></div>
+        <h3>Hardware Longevity</h3>
+        <p>Machines from 2010 to 2026 are welcome here. A computer that still runs deserves software that still supports it.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-icon"></div>
+        <h3>Calm Computing</h3>
+        <p>Minimal notifications. Thoughtful defaults. A desktop environment tuned for focus rather than stimulation or distraction.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-icon"></div>
+        <h3>Local-First Future</h3>
+        <p>Privacy-respecting AI tools, offline-capable workflows, and creative infrastructure that belongs to you — not a subscription service.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section class="screenshots" id="screenshots">
+  <div class="section-inner">
+    <p class="section-label reveal">The Desktop</p>
+    <h2 class="section-title reveal">See it in motion.</h2>
+    <p class="section-body reveal">
+      SelahOS running on real hardware. KDE Plasma 6 with the Selah
+      theme — dark navy, warm gold, calm by design.
+    </p>
+
+    <div class="screenshots-grid">
+
+      <div class="screenshot-card reveal">
+        <div class="screenshot-img-wrap">
+          <img src="/screenshots/kde-desktop.png" alt="SelahOS KDE Plasma 6 desktop with custom purple and gold wallpaper" loading="lazy">
+        </div>
+        <div class="screenshot-label">
+          <h3>KDE Desktop</h3>
+          <p>The full Selah desktop — KDE Plasma 6.6 on linux-zen, with the custom wallpaper and taskbar live on real hardware.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card reveal">
+        <div class="screenshot-img-wrap">
+          <img src="/screenshots/fastfetch.png" alt="SelahOS fastfetch output showing system info alongside SELAH ASCII logo" loading="lazy">
+        </div>
+        <div class="screenshot-label">
+          <h3>Fastfetch</h3>
+          <p>Linux 6.19.14-zen · KDE Plasma 6.6.4 · KWin Wayland · Intel i5-7360U — running on a 2017 MacBook Pro.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card reveal">
+        <div class="screenshot-img-wrap">
+          <img src="/screenshots/selahbridge-mpc.png" alt="Akai MPC software running on SelahOS via SelahBridge" loading="lazy">
+        </div>
+        <div class="screenshot-label">
+          <h3>SelahBridge — MPC</h3>
+          <p>Akai MPC software running inside SelahOS via SelahBridge. Windows creative tools, no Windows required.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card reveal">
+        <div class="screenshot-img-wrap">
+          <img src="/screenshots/selahbridge-ilok.png" alt="iLok License Manager running on SelahOS showing SELAHOS as a recognized machine" loading="lazy">
+        </div>
+        <div class="screenshot-label">
+          <h3>SelahBridge — iLok</h3>
+          <p>iLok License Manager recognizing SELAHOS as a valid machine. Pro audio licensing works out of the box.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Beta Status -->
+<section class="beta" id="beta">
+  <div class="section-inner">
+    <p class="section-label reveal">Honest Status</p>
+    <h2 class="section-title reveal">SelahOS has begun.<br>Not yet complete.</h2>
+
+    <div class="beta-inner">
+      <div class="reveal">
+        <div class="beta-status-badge">
+          <span class="status-dot"></span>
+          Active Beta Development
+        </div>
+        <p class="section-body">
+          We believe in transparency. SelahOS v1.0-beta is real,
+          functional, and under active development — but it is
+          a beta. Here is an honest picture of where things stand.
+        </p>
+
+        <ul class="beta-items">
+          <li>
+            <span class="item-status status-done"></span>
+            ISO boots to KDE Plasma 6 live desktop
+          </li>
+          <li>
+            <span class="item-status status-done"></span>
+            SelahBridge — Windows app compatibility layer
+          </li>
+          <li>
+            <span class="item-status status-done"></span>
+            Full creator software stack (Ardour, Blender, GIMP, OBS)
+          </li>
+          <li>
+            <span class="item-status status-done"></span>
+            Custom SelahOS graphical installer UI
+          </li>
+          <li>
+            <span class="item-status status-done"></span>
+            PipeWire audio — low latency, JACK compatible
+          </li>
+          <li>
+            <span class="item-status status-wip"></span>
+            Installer backend — WiFi dependency, stabilizing
+          </li>
+          <li>
+            <span class="item-status status-wip"></span>
+            Hardware compatibility — expanding support
+          </li>
+          <li>
+            <span class="item-status status-next"></span>
+            Muse AI Companion — infrastructure ready, model pending
+          </li>
+          <li>
+            <span class="item-status status-next"></span>
+            SelahVault encrypted containers — planned V1.0 GA
+          </li>
+          <li>
+            <span class="item-status status-next"></span>
+            Ground tier (2-4GB RAM machines) — V1.1
+          </li>
+        </ul>
+      </div>
+
+      <div class="beta-honesty reveal">
+        <h3>A note on honesty.</h3>
+        <p>
+          Many software projects overstate readiness.
+          We won't do that.
+        </p>
+        <p>
+          SelahOS beta is for technically curious early adopters
+          who understand that beta means exactly that. If you
+          need a production-stable daily driver today, wait
+          for V1.0 GA.
+        </p>
+        <p>
+          If you want to be part of building something
+          meaningful from the beginning — you're in the
+          right place.
+        </p>
+        <p>
+          We are building in public, with honesty, toward
+          something we believe creators genuinely deserve.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Download -->
+<section class="download" id="download">
+  <div class="section-inner">
+    <p class="section-label reveal">ISO Release</p>
+    <h2 class="section-title reveal">Download SelahOS.</h2>
+
+    <div class="download-inner">
+
+      <div class="reveal">
+        <div class="download-box">
+          <div class="download-box-header">
+            <span class="download-filename">selahos-1.0.0-beta-2026.05.18-x86_64.iso</span>
+            <span class="download-size">5.5 GB</span>
+          </div>
+          <div class="download-box-body">
+            <div class="sha-block">
+              <p class="sha-label">SHA256 Checksum</p>
+              <p class="sha-value">30eeb06f86fbae0b02f9377646ec108197658a4981caf9f10987bc03c7963c54</p>
+            </div>
+            <div class="download-actions">
+              <a href="/downloads/selahos-1.0.0-beta-2026.05.18-x86_64.iso"
+                 class="btn-primary"
+                 download
+                 data-umami-event="ISO Download"
+                 data-umami-event-version="Beta-1.0.1">Download Beta 1.0.1</a>
+              <a href="#beta" class="btn-secondary">Check Status</a>
+            </div>
+            <p class="download-note">
+              <strong>Flash with dd only.</strong> Ventoy is not supported.<br>
+              Example: <code style="font-family: monospace; color: var(--parch-dim);">dd if=selahos-1.0.0-beta-2026.05.18-x86_64.iso of=/dev/sdX bs=4M status=progress</code><br><br>
+              x86_64 only. Secure Boot must be disabled.
+              ARM support planned for V2.0.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="known-issues reveal">
+        <h3>Known Issues</h3>
+        <p class="subtitle">
+          We document every known issue before each release. These are
+          the active items in v1.0-beta. Nothing hidden.
+        </p>
+        <ul class="issue-list">
+          <li>
+            <span class="issue-severity sev-active">Active</span>
+            <span class="issue-text">
+              <strong>Installer requires active internet connection</strong>
+              The installation backend fetches packages and keyring updates live.
+              Offline install is not yet supported.
+            </span>
+          </li>
+          <li>
+            <span class="issue-severity sev-active">Active</span>
+            <span class="issue-text">
+              <strong>Mirror sync failures on some networks</strong>
+              Slow or restricted connections may cause archinstall to timeout
+              during package mirror selection. A retry usually resolves it.
+            </span>
+          </li>
+          <li>
+            <span class="issue-severity sev-minor">Minor</span>
+            <span class="issue-text">
+              <strong>NVIDIA proprietary drivers not pre-installed</strong>
+              Nouveau is active by default. Post-install instructions for NVIDIA
+              are included in the welcome documentation.
+            </span>
+          </li>
+          <li>
+            <span class="issue-severity sev-known">Known</span>
+            <span class="issue-text">
+              <strong>Secure Boot must be disabled in UEFI firmware</strong>
+              SelahOS does not currently ship with signed bootloader keys.
+              This is expected for beta; a signed release is planned for GA.
+            </span>
+          </li>
+          <li>
+            <span class="issue-severity sev-known">Known</span>
+            <span class="issue-text">
+              <strong>Ventoy is not supported</strong>
+              Use <code style="font-family: monospace; font-size: 12px; color: var(--parch-dim);">dd</code> to write the ISO.
+              Ventoy's copy-on-read method causes boot failures with this image.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Founder Vision -->
+<section class="founder" id="founder">
+  <div class="section-inner">
+    <p class="section-label reveal">Founder Vision</p>
+    <h2 class="section-title reveal">Why this matters.</h2>
+
+    <div class="founder-inner">
+      <div class="founder-body">
+        <p class="reveal">
+          I'm a musician, producer, and builder. For most of my life,
+          computing felt designed for someone else — enterprise users,
+          power gamers, developers with expensive hardware.
+          Not for people who create.
+        </p>
+        <p class="reveal">
+          I've watched friends abandon projects because their machines
+          "couldn't keep up." I've seen studios thrown out because the
+          software demanded hardware the artist couldn't afford.
+          I've felt that ceiling myself — the moment where the tool
+          stops serving you and starts costing you.
+        </p>
+
+        <div class="founder-pull-quote reveal">
+          <p>
+            "What I remember most about the moments in computing that
+            moved me — was the feeling of being welcomed. Not just given
+            a tool, but invited into something."
+          </p>
+        </div>
+
+        <p class="reveal">
+          That's what SelahOS is built to be. An invitation. An operating
+          system that looks at your older machine and says: you still
+          belong here. An environment that looks at your workflow and
+          says: I'll get out of your way.
+        </p>
+        <p class="reveal">
+          We are building something we believe creators genuinely deserve —
+          quietly, deliberately, without asking for your constant
+          attention. Your music matters. Your designs matter. Your ideas
+          matter. The technology should serve you.
+        </p>
+        <p class="reveal" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; color: var(--parch); line-height: 1.7;">
+          Technology should create space for human creativity,
+          not consume it.
+        </p>
+      </div>
+
+      <div class="founder-sidebar">
+        <div class="founder-card reveal">
+          <p class="role">Founder</p>
+          <p class="name">Dane-Brandon Noble</p>
+          <p class="company">Selah Technologies LLC</p>
+        </div>
+        <div class="founder-stack reveal">
+          <h4>Built With</h4>
+          <ul>
+            <li>Arch Linux · linux-zen kernel</li>
+            <li>KDE Plasma 6</li>
+            <li>PipeWire · low-latency audio</li>
+            <li>SelahBridge · app compatibility</li>
+            <li>PyQt6 · custom installer</li>
+            <li>Muse AI · local companion</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Support / Ko-fi -->
+<section class="support" id="support">
+  <div class="section-inner">
+    <div class="support-inner">
+      <p class="section-label reveal">Support the Project</p>
+      <h2 class="section-title reveal">If SelahOS resonates with you.</h2>
+
+      <div class="support-body">
+        <p class="reveal">
+          SelahOS is being built by one person, in spare hours, with a clear
+          vision and a lot of coffee. There are no investors. No corporate
+          backing. No roadmap driven by someone else's priorities.
+        </p>
+        <p class="reveal">
+          <em>Every contribution — large or small — goes directly into
+          development time, hardware for testing, and keeping the lights on
+          at Selah Technologies.</em>
+        </p>
+        <p class="reveal">
+          This is entirely optional. SelahOS will always be free and open.
+          But if this project means something to you, and you want to help
+          it keep going, I'm genuinely grateful.
+        </p>
+
+        <div class="support-cta reveal">
+          <a href="https://ko-fi.com/selahos" class="kofi-btn" target="_blank" rel="noopener">
+            <span class="kofi-icon">☕</span>
+            Support on Ko-fi
+          </a>
+          <a href="https://ko-fi.com/selahos" target="_blank" class="btn-primary" style="margin-top:16px;display:inline-block;">
+            &#9749; Support SelahOS on Ko-fi
+          </a>
+          <p>
+            No subscription. No pressure. One-time support whenever it feels right.<br>
+            You can also follow progress and leave a message there.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Access -->
+<section class="access" id="access">
+  <div class="section-inner">
+    <p class="section-label reveal">Get Involved</p>
+    <h2 class="section-title reveal">Beta access is coming.</h2>
+
+    <div class="access-box reveal">
+      <h3>Request Early Access</h3>
+      <p>
+        SelahOS v1.0-beta is in active development. Direct
+        ISO downloads will be available once installer
+        stability reaches an acceptable threshold for
+        general testing.
+      </p>
+      <a href="mailto:beta@selahos.io" class="btn-primary">
+        Request Early Access
+      </a>
+      <p class="access-note">
+        Currently testing on x86_64 hardware.<br>
+        ARM support planned for V2.0.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand-block">
+      <span class="footer-brand">SelahOS</span>
+      <span class="footer-tagline">Pause. Reflect. Create.</span>
+    </div>
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <div class="footer-nav-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#why">Philosophy</a></li>
+          <li><a href="#pillars">Core Pillars</a></li>
+          <li><a href="#screenshots">Screenshots</a></li>
+          <li><a href="#founder">Founder Vision</a></li>
+        </ul>
+      </div>
+      <div class="footer-nav-col">
+        <h4>Release</h4>
+        <ul>
+          <li><a href="#beta">Beta Status</a></li>
+          <li><a href="#download">Download ISO</a></li>
+          <li><a href="#access">Request Access</a></li>
+        </ul>
+      </div>
+      <div class="footer-nav-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="/docs/">Documentation</a></li>
+          <li><a href="#support">Support the Project</a></li>
+          <li><a href="mailto:beta@selahos.io">Contact</a></li>
+          <li><a href="mailto:beta@selahos.io">Press Inquiries</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">
+      © 2026 Selah Technologies LLC · All rights reserved
+    </p>
+    <p class="footer-legal">
+      SelahOS™ and SelahBridge™ are trademarks of Selah Technologies LLC
+    </p>
+  </div>
+</footer>
+
+<script>
+  // ── Scroll reveal ────────────────────────────────────────
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ── Auto-hide nav on scroll ──────────────────────────────
+  const navEl = document.querySelector('.site-nav');
+  let lastY = 0;
+
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y > lastY && y > 80) {
+      navEl.style.transform = 'translateY(-100%)';
+    } else {
+      navEl.style.transform = 'translateY(0)';
+    }
+    lastY = y;
+  }, { passive: true });
+
+  // Add transition for smooth hide/show
+  navEl.style.transition = 'transform 0.3s ease';
+
+  // ── Hamburger menu ───────────────────────────────────────
+  const hamburger = document.querySelector('.nav-hamburger');
+  const mobileMenu = document.querySelector('.mobile-menu');
+
+  function openMenu() {
+    hamburger.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    mobileMenu.classList.add('open');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    mobileMenu.classList.remove('open');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.contains('open') ? closeMenu() : openMenu();
+  });
+
+  // Close when a link is tapped (menu auto-closes, nav slides back in)
+  mobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      closeMenu();
+      navEl.style.transform = 'translateY(0)';
+    });
+  });
+
+  // Close on background tap
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target === mobileMenu) closeMenu();
+  });
+
+  // Close mobile menu if user scrolls (e.g. swipe on iOS)
+  window.addEventListener('scroll', () => {
+    if (mobileMenu.classList.contains('open')) closeMenu();
+  }, { passive: true });
+</script>
+
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('selahos', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support SelahOS',
+    'floating-chat.donateButton.background-color': '#D6A85A',
+    'floating-chat.donateButton.text-color': '#0B0F1A'
+  });
+</script>
+</body>
+</html>
