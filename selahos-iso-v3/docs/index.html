@@ -259,7 +259,7 @@
       <tr><td>Kernel</td><td>linux-zen (low-latency optimized)</td></tr>
       <tr><td>Desktop</td><td>KDE Plasma 6</td></tr>
       <tr><td>Audio</td><td>PipeWire + WirePlumber (JACK-compatible)</td></tr>
-      <tr><td>Windows compatibility</td><td>SelahBridge (Wine Staging + DXVK + WineASIO)</td></tr>
+      <tr><td>Windows compatibility</td><td>SelahBridge (proprietary)</td></tr>
       <tr><td>Theme</td><td>Selah (dark gold — Kvantum + Plasma)</td></tr>
     </table>
   </section>
@@ -274,13 +274,13 @@
       <tr><td>CPU</td><td>x86_64, 2 cores</td><td>4+ cores, Intel/AMD 2018+</td></tr>
       <tr><td>RAM</td><td>4 GB</td><td>16 GB</td></tr>
       <tr><td>Storage</td><td>20 GB</td><td>60 GB SSD</td></tr>
-      <tr><td>GPU</td><td>Any with KMS</td><td>Vulkan-capable (for DXVK)</td></tr>
+      <tr><td>GPU</td><td>Any with KMS</td><td>Vulkan-capable (recommended)</td></tr>
       <tr><td>Audio</td><td>Any ALSA device</td><td>USB/PCIe audio interface</td></tr>
       <tr><td>Boot</td><td>UEFI or BIOS</td><td>UEFI</td></tr>
     </table>
 
     <div class="callout warn">
-      <strong>Note:</strong> SelahBridge requires Vulkan support for DXVK. Intel HD 4000+,
+      <strong>Note:</strong> SelahBridge requires a Vulkan-capable GPU for full compatibility. Intel HD 4000+,
       AMD GCN 1.0+, and NVIDIA Kepler+ are supported.
     </div>
   </section>
@@ -337,149 +337,49 @@
   <!-- ── SELAHBRIDGE ── -->
   <section id="selahbridge">
     <h2>What Is SelahBridge?</h2>
-    <p>SelahBridge is SelahOS's Windows application compatibility layer, built on
-    <strong>Wine Staging</strong>, <strong>DXVK</strong>, and <strong>WineASIO</strong>.
-    It lets you run Windows DAWs, plugins, and creative tools without a Windows installation.</p>
-
-    <table>
-      <tr><th>Component</th><th>Purpose</th></tr>
-      <tr><td>Wine Staging</td><td>Windows application runtime</td></tr>
-      <tr><td>DXVK</td><td>DirectX 9/10/11 → Vulkan translation</td></tr>
-      <tr><td>WineASIO</td><td>Windows ASIO audio → PipeWire JACK bridge</td></tr>
-      <tr><td>winetricks</td><td>Runtime helpers (Visual C++, .NET, etc.)</td></tr>
-      <tr><td>Firefox (Windows)</td><td>Browser for app authorization (iLok, inMusic, etc.)</td></tr>
-    </table>
+    <p>SelahBridge is SelahOS's proprietary Windows application compatibility layer. It enables professional Windows creative software — including DAWs and music production tools — to run natively on SelahOS with full audio support.</p>
+    <p>SelahBridge is exclusively available on SelahOS and is not available as a standalone product.</p>
   </section>
 
   <!-- ── SB INSTALL ── -->
   <section id="sb-install">
     <h2>Installing SelahBridge</h2>
 
-    <p>Open <strong>Application Menu → SelahBridge → Setup</strong>, or run:</p>
-    <pre><code>pkexec /usr/local/bin/selahbridge-setup</code></pre>
-
-    <p>The setup wizard will:</p>
+    <h3>Via the GUI</h3>
     <ol>
-      <li>Enable the multilib repository</li>
-      <li>Add Chaotic-AUR (provides DXVK Async and WineASIO)</li>
-      <li>Install Wine Staging, DXVK, WineASIO, and 32-bit libraries</li>
-      <li>Configure PipeWire JACK with optimized buffer settings</li>
-      <li>Add your user to the <code>audio</code> and <code>realtime</code> groups</li>
-      <li>Initialize the Wine prefix (Windows 10 mode, 96 DPI)</li>
-      <li>Register WineASIO</li>
+      <li>Open <strong>SelahBridge Setup</strong> from the application launcher.</li>
+      <li>The setup wizard will guide you through installation.</li>
+      <li>Log out and back in when prompted.</li>
     </ol>
 
-    <div class="callout">
-      <strong>Internet required.</strong> Installation downloads approximately 800 MB and
-      takes 5–15 minutes depending on your connection and hardware.
-    </div>
-
-    <p>After setup completes, <strong>log out and back in</strong> to activate the
-    <code>realtime</code> group membership required for low-latency audio.</p>
+    <h3>Via the Console</h3>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selahbridge-install.sh | sudo bash</code></pre>
   </section>
 
   <!-- ── SB MANAGER ── -->
   <section id="sb-manager">
-    <h2>SelahBridge Manager</h2>
-    <p>
-      <span class="badge badge-gold">v1.0.1</span>&nbsp;
-      The Manager is a full control panel for SelahBridge — no winecfg, no regedit needed.
-    </p>
-
-    <p>Launch from <strong>Application Menu → SelahBridge → Manager</strong>, or:</p>
-    <pre><code>pkexec /usr/local/bin/selahbridge-manager</code></pre>
-
-    <h3>Tab: Installed Apps</h3>
-    <p>Scans <code>~/.wine/drive_c/Program Files/</code> and
-    <code>Program Files (x86)/</code> and lists all detected Windows applications.
-    Each app has <strong>Launch</strong> and <strong>Remove</strong> buttons.
-    Use <strong>+ Add App</strong> to browse for any <code>.exe</code> and launch it directly.</p>
-
-    <h3>Tab: Wine Settings</h3>
-    <p>Configure Windows version (10, 11, 7, or XP), display DPI (72–192), audio driver
-    (WineASIO / PulseAudio / ALSA), and default browser — all applied via
-    <code>wine reg add</code> with a single click. Use <strong>Initialize Prefix</strong>
-    to create or reset <code>~/.wine</code>.</p>
-
-    <h3>Tab: Audio</h3>
-    <p>Adjust the PipeWire/JACK buffer size (64–1024 samples), re-register WineASIO,
-    and restart PipeWire — all without opening a terminal. The current active audio
-    sink is shown at the top of the tab.</p>
-
-    <h3>Tab: Snapshots</h3>
-    <p>Create a <code>tar.gz</code> backup of your entire Wine prefix
-    (<code>~/.wine</code>) to <code>~/selahbridge-snapshots/</code>.
-    Restore any snapshot with one click — the current prefix is automatically
-    backed up to <code>~/.wine.bak</code> before restore.</p>
-
-    <h3>Tab: Uninstall</h3>
-    <p>Selectively remove SelahBridge components (Wine, DXVK, WineASIO, libraries)
-    with checkboxes, with an optional Wine prefix wipe. All operations logged in-window.</p>
+    <h2>Confirmed Working Applications</h2>
+    <ul>
+      <li>InMusic Software Center ✓</li>
+      <li>Additional creative applications in testing</li>
+    </ul>
   </section>
 
   <!-- ── SB AUDIO ── -->
   <section id="sb-audio">
-    <h2>Audio Setup</h2>
-
-    <h3>WineASIO and JACK</h3>
-    <p>SelahBridge routes Windows ASIO audio through PipeWire's JACK interface.
-    This gives you the same low-latency path that native Linux DAWs use.</p>
-
-    <h4>Recommended buffer sizes</h4>
-    <table>
-      <tr><th>Buffer</th><th>Latency (48 kHz)</th><th>Use Case</th></tr>
-      <tr><td>64 samples</td><td>~1.3 ms</td><td>Live monitoring (needs fast CPU)</td></tr>
-      <tr><td>128 samples</td><td>~2.7 ms</td><td>Real-time recording</td></tr>
-      <tr><td>256 samples</td><td>~5.3 ms</td><td>Default — works on most hardware</td></tr>
-      <tr><td>512 samples</td><td>~10.7 ms</td><td>Mixing / heavy plugin loads</td></tr>
-      <tr><td>1024 samples</td><td>~21.3 ms</td><td>Mastering / offline bounce</td></tr>
-    </table>
-
-    <p>Change the buffer in <strong>SelahBridge Manager → Audio</strong>, then click
-    <strong>Restart PipeWire</strong>.</p>
-
-    <h3>Setting Audio Driver in Your DAW</h3>
-    <p>In your Windows DAW (FL Studio, Ableton, Reaper, etc.), go to audio preferences
-    and select <strong>ASIO</strong> as the audio driver, then choose
-    <strong>WineASIO</strong> as the ASIO device.</p>
-
-    <div class="callout tip">
-      <strong>Tip:</strong> If WineASIO doesn't appear in your DAW, open
-      SelahBridge Manager → Audio → <strong>Register WineASIO</strong>, then restart the DAW.
-    </div>
+    <h2>Audio Support</h2>
+    <p>SelahBridge includes full professional audio routing support. ASIO-compatible applications are supported through SelahBridge's integrated audio bridge.</p>
   </section>
 
   <!-- ── RUNNING APPS ── -->
   <section id="sb-apps">
-    <h2>Running Windows Apps</h2>
+    <h2>Hardware Compatibility</h2>
+    <p>Tested on MacBookPro9,2 &middot; MacBookPro14,1 &middot; iMac16,2</p>
+    <p>All Apple Intel Macs from 2009&ndash;2020 supported.</p>
 
-    <h3>Installing an App</h3>
-    <p>Download the Windows installer (<code>.exe</code>) and run it via SelahBridge Manager
-    → Installed Apps → <strong>+ Add App</strong>, or from a terminal:</p>
-    <pre><code>wine ~/Downloads/SomeApp-setup.exe</code></pre>
-
-    <h3>Authorization (iLok, inMusic, Splice)</h3>
-    <p>SelahBridge installs Firefox for Windows inside the Wine prefix specifically for
-    authorization workflows. When an app opens a browser for license activation, it will
-    use this Firefox instance. Sign in normally — credentials are stored inside the Wine
-    prefix and persist across sessions.</p>
-
-    <h3>Known Working Apps</h3>
-    <p>The following Windows creative apps have been tested on SelahBridge:</p>
-    <ul>
-      <li>FL Studio 21 (ASIO audio, VST2/VST3)</li>
-      <li>Ableton Live 11/12 (ASIO, requires Windows 10 mode)</li>
-      <li>Reaper (full functionality)</li>
-      <li>iZotope RX (standalone + VST)</li>
-      <li>Native Instruments Komplete (via Native Access)</li>
-      <li>Splice (sample browser + downloads)</li>
-    </ul>
-
-    <div class="callout">
-      <strong>VST plugins:</strong> Point your DAW's plugin scanner at
-      <code>C:\Program Files\VSTPlugins</code> (which maps to
-      <code>~/.wine/drive_c/Program Files/VSTPlugins/</code> on disk).
-    </div>
+    <h2>Support</h2>
+    <p>For SelahBridge support visit <a href="https://selahos.io">selahos.io</a> or email
+    <a href="mailto:support@selahos.io">support@selahos.io</a></p>
   </section>
 
   <!-- ── RECOVERY ── -->
@@ -514,12 +414,11 @@
     <h2>Updating SelahOS</h2>
     <p>SelahOS is a rolling release based on Arch Linux. To update:</p>
     <pre><code>selah-update</code></pre>
-    <p>This is equivalent to <code>pacman -Syu</code> with pre-flight keyring and mirror
+    <p>This runs a full system update with pre-flight keyring and mirror
     checks. Run it periodically — at least once a month — to keep packages current.</p>
 
     <div class="callout warn">
-      <strong>Before major kernel or Wine updates:</strong> Create a SelahBridge snapshot
-      (Manager → Snapshots) so you can roll back if something breaks.
+      <strong>Before major updates:</strong> Create a SelahBridge snapshot in the SelahBridge Manager so you can roll back if something breaks.
     </div>
   </section>
 
@@ -527,23 +426,20 @@
   <section id="faq">
     <h2>FAQ</h2>
 
-    <h3>No audio in Wine / DAW after reboot</h3>
-    <p>Open SelahBridge Manager → Audio → <strong>Restart PipeWire</strong>.
-    If the problem persists, re-register WineASIO from the same tab.</p>
+    <h3>No audio in my DAW after reboot</h3>
+    <p>Open SelahBridge Manager → Audio → <strong>Restart Audio Engine</strong>.
+    If the problem persists, use the audio registration option from the same tab.</p>
 
-    <h3>Wine prefix is corrupted / app won't launch</h3>
-    <p>Restore a snapshot from SelahBridge Manager → Snapshots, or re-initialize
-    the prefix from Wine Settings → <strong>Initialize Prefix</strong> (this wipes
-    all installed Windows apps).</p>
+    <h3>A Windows app won't launch</h3>
+    <p>Restore a snapshot from SelahBridge Manager → Snapshots, or contact
+    <a href="mailto:support@selahos.io">support@selahos.io</a> for assistance.</p>
 
-    <h3>SelahBridge Setup fails at the Chaotic-AUR step</h3>
-    <p>This usually means the keyserver is temporarily unavailable. Wait a few minutes
-    and retry. Alternatively, run manually:</p>
-    <pre><code>sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-sudo pacman-key --lsign-key 3056513887B78AEB</code></pre>
+    <h3>SelahBridge Setup fails or stalls</h3>
+    <p>This usually means a network resource is temporarily unavailable. Wait a few minutes
+    and retry. If the issue persists, contact <a href="mailto:support@selahos.io">support@selahos.io</a>.</p>
 
-    <h3>DAW reports "ASIO driver not found"</h3>
-    <p>Open SelahBridge Manager → Audio → <strong>Register WineASIO</strong>,
+    <h3>DAW reports no audio device found</h3>
+    <p>Open SelahBridge Manager → Audio and use the audio registration option,
     then restart the DAW.</p>
 
     <h3>System is slow / high CPU after install</h3>
