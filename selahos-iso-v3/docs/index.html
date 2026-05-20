@@ -109,10 +109,12 @@
 
   /* ── Mobile overlay ── */
   .mobile-menu {
-    position: fixed; inset: 0; z-index: 199;
+    position: fixed; top: 62px; left: 0; right: 0; bottom: 0; z-index: 199;
     background: rgba(8,12,24,0.98);
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    align-items: center; justify-content: flex-start;
+    overflow-y: auto;
+    padding: 40px 0 40px;
     backdrop-filter: blur(16px);
     visibility: hidden; opacity: 0; pointer-events: none;
     transition: opacity 0.3s, visibility 0.3s;
