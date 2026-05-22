@@ -19,11 +19,16 @@ Base: Arch Linux + linux-zen kernel + KDE Plasma 6 + PipeWire
 - NEVER use Ventoy — always burn with dd
 
 ## Key files
-- ISO profile: ~/SelahOS-Dev/selahos-iso-v2.0-beta/
+- ISO profile repo: ~/SelahOS-Dev/selahos-iso/ (github.com/SelahOS/selahos-iso, private)
+- ISO profile: ~/SelahOS-Dev/selahos-iso/selahos-iso-v3/
 - Installer UI: airootfs/usr/local/bin/selahos-installer
 - Boot config: grub/grub.cfg
 - mkinitcpio: airootfs/etc/mkinitcpio.conf
 - Customize script: airootfs/root/customize_airootfs.sh
+
+## ISO repo workflow
+- After every edit to the ISO profile, commit and push to selahos-iso
+- .gitignore excludes: selahbridge-license.py, selahbridge-keygen, build artifacts, *.iso
 
 ## Build machine
 2017 MacBook Pro running SelahOS
@@ -32,7 +37,7 @@ Build command:
 sudo mkarchiso -v \
     -w /home/dbnoble/selahos-build \
     -o /home/dbnoble/selahos-iso-output \
-    /home/dbnoble/selahos-iso-v2.0-beta
+    /home/dbnoble/selahos-iso-v3
 
 ## What Claude Code should focus on
 Fix the archinstall backend in selahos-installer so installation
