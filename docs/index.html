@@ -564,10 +564,34 @@
   <!-- ── UPDATE ── -->
   <section id="update">
     <h2>Updating SelahOS</h2>
-    <p>SelahOS is a rolling release based on Arch Linux. To update:</p>
+    <p>SelahOS is a rolling release based on Arch Linux, updated in two layers: the
+    underlying Arch system, and SelahOS's own creator tools and theme.</p>
+
+    <h3>System updates</h3>
+    <p>To pull the latest packages from upstream Arch mirrors:</p>
     <pre><code>selah-update</code></pre>
     <p>This runs a full system update with pre-flight keyring and mirror
     checks. Run it periodically — at least once a month — to keep packages current.</p>
+
+    <h3>SelahOS component updates (OTA)</h3>
+    <p>SelahBridge, the device editor suite, the Selah theme, and the recovery
+    tools (<code>selah-repair</code>, <code>selah-update</code> itself, and the rest)
+    are packaged separately from the base system, signed, and versioned
+    independently of the ISO release cycle — so a fix to, say, the MPC Studio 2
+    editor can reach installed systems without waiting on a full ISO respin.
+    <code>selah-update</code> pulls these the same way it pulls system packages,
+    just from a dedicated <code>[selahos]</code> pacman repository instead of the
+    Arch mirrors.</p>
+
+    <div class="callout tip">
+      <strong>Currently rolling out:</strong> the component repo is in beta —
+      the four packages (<code>selah-apps</code>, <code>selah-device-editors</code>,
+      <code>selah-theme</code>, <code>selah-tools</code>) build and verify
+      cleanly, but public hosting at <code>repo.selahos.io</code> isn't live yet.
+      Until it is, these components still ship as part of the ISO itself, so
+      you're not missing updates in the meantime — this page will note when
+      OTA component updates go live.
+    </div>
 
     <div class="callout warn">
       <strong>Before major updates:</strong> Create a SelahBridge snapshot in the SelahBridge Manager so you can roll back if something breaks.
