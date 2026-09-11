@@ -1,0 +1,15 @@
+{
+  "product": "SelahOS",
+  "channel": "beta",
+  "version": "Beta 2.0.1",
+  "release_date": "2026-09-09",
+  "architecture": "x86_64",
+  "iso_filename": "SelahOS-Beta2.0.1-x86_64.iso",
+  "iso_size_bytes": 10448345088,
+  "sha256": "5378216432c4747b442e3a9e4aa97161d6b46f12eaf83c66eb4a23dc187254b3",
+  "iso_url": "https://downloads.selahos.io/releases/beta2/SelahOS-Beta2.0.1-x86_64.iso",
+  "sha256_url": "https://downloads.selahos.io/releases/beta2/SelahOS-Beta2.0.1-x86_64.iso.sha256",
+  "signature_url": null,
+  "release_notes_url": "https://selahos.io/#beta",
+  "compatibility_url": "https://selahos.io/#compatibility"
+}

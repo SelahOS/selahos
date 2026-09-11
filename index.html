@@ -6,8 +6,8 @@
   <link rel="apple-touch-icon" href="/favicon.svg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SelahOS — Linux for Music Producers & Creative Professionals</title>
-<meta name="description" content="SelahOS is a creator-first Linux distribution for musicians and producers. Run Windows DAWs and creative software on Linux. Free download. Optimized for Apple Intel Macs 2009-2020.">
+<title>Download SelahOS Beta 2 | Creator-First Linux for Intel Macs & PCs</title>
+<meta name="description" content="Download SelahOS Beta 2.0.1, a creator-first Linux operating system for supported Intel Macs and PCs. Check compatibility, verify the ISO, and help test the next SelahOS release.">
 <meta name="keywords" content="Linux music production, DAW on Linux, Windows DAW Linux, Ableton Linux, FL Studio Linux, Pro Tools Linux, music production OS, Linux for musicians, Apple Mac Linux, SelahOS, creative Linux distro, ASIO Linux, pro audio Linux, Arch Linux audio, old Mac Linux, MacBook Linux">
 <meta name="author" content="Selah Technologies LLC">
 <meta name="robots" content="index, follow">
@@ -16,16 +16,16 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://selahos.io">
-<meta property="og:title" content="SelahOS — Run Windows DAWs on Linux. Free Download.">
-<meta property="og:description" content="SelahOS enables musicians and producers to run Windows creative software on Linux. Built on Arch Linux with the zen kernel. Optimized for Apple Intel Macs. Free beta download available now.">
+<meta property="og:title" content="SelahOS Beta 2 is here.">
+<meta property="og:description" content="Your machine still has work to do. Give compatible Intel Macs and PCs another path forward with SelahOS Beta 2.">
 <meta property="og:image" content="https://selahos.io/og-image.png">
 <meta property="og:site_name" content="SelahOS">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@selahos">
-<meta name="twitter:title" content="SelahOS — Linux for Creators. Run Your Windows DAWs.">
-<meta name="twitter:description" content="Run Windows DAWs and creative software on Linux. Free beta download. Built for musicians, producers, and creators.">
+<meta name="twitter:title" content="SelahOS Beta 2 is here.">
+<meta name="twitter:description" content="Your machine still has work to do. Give compatible Intel Macs and PCs another path forward with SelahOS Beta 2.">
 <meta name="twitter:image" content="https://selahos.io/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -284,6 +284,14 @@
     animation: fadeUp 1s ease 1.2s forwards;
   }
 
+  .hero-beta-note {
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--parch-dim);
+    opacity: 0;
+    animation: fadeUp 1s ease 1.4s forwards;
+  }
+
   .btn-primary {
     padding: 14px 36px;
     background: var(--gold);
@@ -408,6 +416,26 @@
     color: var(--parch);
     line-height: 1.5;
     font-weight: 300;
+  }
+
+  .why-now-body {
+    max-width: 640px;
+    margin: 40px auto 0;
+    text-align: center;
+  }
+
+  .why-now-body p {
+    font-size: 16px;
+    color: var(--parch-dim);
+    line-height: 1.9;
+    margin-bottom: 20px;
+  }
+
+  .why-now-disclaimer {
+    margin-top: 32px !important;
+    font-size: 13px !important;
+    color: var(--parch-dim);
+    opacity: 0.7;
   }
 
   .why-quote cite {
@@ -703,6 +731,132 @@
     font-weight: 400;
   }
 
+  .download-beta-warning {
+    font-size: 13px;
+    color: var(--parch-dim);
+    line-height: 1.7;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+    background: var(--bg);
+    border-left: 2px solid var(--gold);
+  }
+
+  .download-beta-warning strong {
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .download-links {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .download-links a {
+    font-size: 13px;
+    color: var(--parch-dim);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+
+  .download-links a:hover,
+  .download-links a:focus-visible {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .verify-block {
+    margin-top: 24px;
+    padding: 24px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+  }
+
+  .verify-block h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 12px;
+  }
+
+  .verify-block p {
+    font-size: 13px;
+    color: var(--parch-dim);
+    line-height: 1.8;
+    margin-bottom: 8px;
+  }
+
+  .compat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 48px;
+  }
+
+  .compat-col h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--parch);
+    margin-bottom: 16px;
+  }
+
+  .compat-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .compat-list {
+    list-style: none;
+  }
+
+  .compat-list li {
+    font-size: 14px;
+    color: var(--parch-dim);
+    line-height: 1.7;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compat-list li:last-child { border-bottom: none; }
+
+  .compat-list strong {
+    color: var(--parch);
+    font-weight: 400;
+  }
+
+  .compat-list-muted li {
+    color: var(--muted);
+  }
+
+  .compat-notes {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .compat-notes p {
+    font-size: 14px;
+    color: var(--parch-dim);
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  .compat-notes strong {
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  @media (max-width: 720px) {
+    .compat-grid { grid-template-columns: 1fr; gap: 32px; }
+  }
+
   .known-issues {
     padding-top: 8px;
   }
@@ -995,6 +1149,29 @@
     letter-spacing: 0.5px;
   }
 
+  /* ── Campaign ───────────────────────────────────────────── */
+  .campaign {
+    text-align: center;
+  }
+
+  .campaign-body {
+    max-width: 520px;
+    margin: 40px auto 0;
+  }
+
+  .campaign-body p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(18px, 2.4vw, 22px);
+    font-style: italic;
+    color: var(--parch-dim);
+    line-height: 1.9;
+    margin-bottom: 4px;
+  }
+
+  .campaign-cta {
+    margin-top: 40px;
+  }
+
   /* ── Footer ─────────────────────────────────────────────── */
   footer {
     padding: 80px 48px 48px;
@@ -1161,9 +1338,9 @@
     "name": "Selah Technologies LLC",
     "url": "https://selahos.io"
   },
-  "downloadUrl": "https://selahos.io/downloads/selahos-1.0.0-beta-2026.05.18-x86_64.iso",
-  "softwareVersion": "1.0.1-beta",
-  "releaseNotes": "Beta 1.0.1 — Tested on Apple Intel Macs 2009-2020"
+  "downloadUrl": "https://downloads.selahos.io/releases/beta2/SelahOS-Beta2.0.1-x86_64.iso",
+  "softwareVersion": "Beta 2.0.1",
+  "releaseNotes": "https://selahos.io/#beta"
 }
 </script>
 </head>
@@ -1178,6 +1355,7 @@
     <li><a href="#pillars">Pillars</a></li>
     <li><a href="#screenshots">Screenshots</a></li>
     <li><a href="#beta">Beta</a></li>
+    <li><a href="#compatibility">Compatibility</a></li>
     <li><a href="#download">Download</a></li>
     <li><a href="#founder">Vision</a></li>
     <li><a href="#support">Support</a></li>
@@ -1197,6 +1375,7 @@
     <li><a href="#pillars">Pillars</a></li>
     <li><a href="#screenshots">Screenshots</a></li>
     <li><a href="#beta">Beta</a></li>
+    <li><a href="#compatibility">Compatibility</a></li>
     <li><a href="#download">Download</a></li>
     <li><a href="#founder">Vision</a></li>
     <li><a href="#support">Support</a></li>
@@ -1206,18 +1385,21 @@
 
 <!-- Hero -->
 <section class="hero">
-  <p class="hero-eyebrow">Selah Technologies LLC · v1.0-beta</p>
+  <p class="hero-eyebrow">Selah Technologies LLC · Beta 2.0.1</p>
   <h1 class="hero-wordmark">SELAH</h1>
   <p class="hero-tagline">Pause. Reflect. Create.</p>
   <div class="hero-divider"></div>
   <p class="hero-statement">
-    Technology should adapt to humans —<br>
-    not force humans to adapt to machines.
+    Your Mac may be unsupported.<br>
+    Your calling isn't.
   </p>
   <div class="hero-actions">
-    <a href="#download" class="btn-primary">Download Beta</a>
-    <a href="#why" class="btn-secondary">Learn More</a>
+    <a href="#download" class="btn-primary">Download Beta 2.0.1</a>
+    <a href="#compatibility" class="btn-secondary">Check Compatibility</a>
   </div>
+  <p class="hero-beta-note">
+    Beta software may contain bugs. Back up important data before installing.
+  </p>
 </section>
 
 <!-- Why SelahOS -->
@@ -1258,6 +1440,33 @@
         </blockquote>
         <cite>SelahOS Design Principle</cite>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Now -->
+<section class="why-now" id="why-now">
+  <div class="section-inner">
+    <p class="section-label reveal">Why Now</p>
+    <h2 class="section-title reveal">Your machine still has work to do.</h2>
+    <div class="why-now-body reveal">
+      <p>
+        Technology moves forward. That does not mean capable hardware
+        suddenly loses its value.
+      </p>
+      <p>
+        macOS 27 Golden Gate moves Apple's current major operating-system
+        support to Apple-silicon Macs. SelahOS offers compatible Intel
+        Macs — and supported PCs — another path forward.
+      </p>
+      <p>
+        Not because every old computer should live forever. Because
+        useful hardware should be allowed to remain useful.
+      </p>
+      <p class="why-now-disclaimer">
+        SelahOS is an independent project and is not affiliated with or
+        endorsed by Apple Inc.
+      </p>
     </div>
   </div>
 </section>
@@ -1362,7 +1571,7 @@
           Active Beta Development
         </div>
         <p class="section-body">
-          We believe in transparency. SelahOS v1.0-beta is real,
+          We believe in transparency. SelahOS Beta 2.0.1 is real,
           functional, and under active development — but it is
           a beta. Here is an honest picture of where things stand.
         </p>
@@ -1382,15 +1591,22 @@
           </li>
           <li>
             <span class="item-status status-done"></span>
-            Custom SelahOS graphical installer UI
+            Custom SelahOS graphical installer UI, works offline from a
+            bundled package repo
           </li>
           <li>
             <span class="item-status status-done"></span>
             PipeWire audio — low latency, JACK compatible
           </li>
           <li>
+            <span class="item-status status-done"></span>
+            Per-machine hardware profile — re-tunes Wi-Fi/kernel settings
+            automatically if a drive is moved to different hardware
+          </li>
+          <li>
             <span class="item-status status-wip"></span>
-            Installer backend — WiFi dependency, stabilizing
+            Wi-Fi reconnect after sleep — improved, not yet fully reliable
+            on all Broadcom chipsets
           </li>
           <li>
             <span class="item-status status-wip"></span>
@@ -1429,6 +1645,11 @@
           right place.
         </p>
         <p>
+          This is Beta 2.0.1, our initial public build on this track.
+          Beta 2.0.2 is planned in roughly six weeks and will fold in
+          feedback and testing data from this release.
+        </p>
+        <p>
           We are building in public, with honesty, toward
           something we believe creators genuinely deserve.
         </p>
@@ -1440,37 +1661,66 @@
 <!-- Download -->
 <section class="download" id="download">
   <div class="section-inner">
-    <p class="section-label reveal">ISO Release</p>
-    <h2 class="section-title reveal">Download SelahOS.</h2>
+    <p class="section-label reveal">SELAHOS BETA 2</p>
+    <h2 class="section-title reveal">Your machine still has work to do.</h2>
+    <p class="section-body reveal">
+      SelahOS is a creator-first Linux operating system designed for
+      musicians, producers, developers, makers, and people who want
+      capable hardware to stay useful longer.
+    </p>
 
     <div class="download-inner">
 
       <div class="reveal">
         <div class="download-box">
           <div class="download-box-header">
-            <span class="download-filename">selahos-1.0.0-beta-2026.05.18-x86_64.iso</span>
-            <span class="download-size">5.5 GB</span>
+            <span class="download-filename">SelahOS-Beta2.0.1-x86_64.iso</span>
+            <span class="download-size">9.7 GB</span>
           </div>
           <div class="download-box-body">
+            <p class="download-beta-warning">
+              <strong>Beta software.</strong> SelahOS Beta 2.0.1 is
+              pre-release. It may contain bugs, incomplete features, or
+              hardware-specific issues. Back up important data before
+              installing. Compatibility varies by device.
+            </p>
             <div class="sha-block">
               <p class="sha-label">SHA256 Checksum</p>
-              <p class="sha-value">30eeb06f86fbae0b02f9377646ec108197658a4981caf9f10987bc03c7963c54</p>
+              <p class="sha-value">5378216432c4747b442e3a9e4aa97161d6b46f12eaf83c66eb4a23dc187254b3</p>
             </div>
             <div class="download-actions">
-              <a href="/downloads/selahos-1.0.0-beta-2026.05.18-x86_64.iso"
+              <a href="https://downloads.selahos.io/releases/beta2/SelahOS-Beta2.0.1-x86_64.iso"
                  class="btn-primary"
                  download
-                 data-umami-event="ISO Download"
-                 data-umami-event-version="Beta-1.0.1">Download Beta 1.0.1</a>
-              <a href="#beta" class="btn-secondary">Check Status</a>
+                 data-umami-event="selahos_beta2_download_click"
+                 data-umami-event-release="beta2"
+                 data-umami-event-version="Beta-2.0.1"
+                 data-umami-event-source="download_page">Download SelahOS Beta 2.0.1</a>
+              <a href="#compatibility" class="btn-secondary">Check Compatibility</a>
             </div>
             <p class="download-note">
-              <strong>Flash with dd only.</strong> Ventoy is not supported.<br>
-              Example: <code style="font-family: monospace; color: var(--parch-dim);">dd if=selahos-1.0.0-beta-2026.05.18-x86_64.iso of=/dev/sdX bs=4M status=progress</code><br><br>
+              <strong>Flash with dd only.</strong> Ventoy is not supported for this image.<br>
+              Example: <code style="font-family: monospace; color: var(--parch-dim);">dd if=SelahOS-Beta2.0.1-x86_64.iso of=/dev/sdX bs=4M status=progress</code><br><br>
               x86_64 only. Secure Boot must be disabled.
               ARM support planned for V2.0.
             </p>
+            <div class="download-links">
+              <a href="#beta">Release Notes</a>
+              <a href="#compatibility">Compatibility</a>
+              <a href="/docs/">Installation Guide</a>
+            </div>
           </div>
+        </div>
+
+        <div class="verify-block reveal">
+          <h3>Verify your download</h3>
+          <p>
+            After downloading the ISO, verify its SHA-256 checksum
+            before writing it to a USB drive.
+          </p>
+          <p><strong>Linux:</strong> <code style="font-family: monospace; color: var(--parch-dim);">sha256sum SelahOS-Beta2.0.1-x86_64.iso</code></p>
+          <p><strong>macOS:</strong> <code style="font-family: monospace; color: var(--parch-dim);">shasum -a 256 SelahOS-Beta2.0.1-x86_64.iso</code></p>
+          <p><strong>Windows (PowerShell):</strong> <code style="font-family: monospace; color: var(--parch-dim);">Get-FileHash .\SelahOS-Beta2.0.1-x86_64.iso -Algorithm SHA256</code></p>
         </div>
       </div>
 
@@ -1478,23 +1728,16 @@
         <h3>Known Issues</h3>
         <p class="subtitle">
           We document every known issue before each release. These are
-          the active items in v1.0-beta. Nothing hidden.
+          the active items in Beta 2.0.1. Nothing hidden.
         </p>
         <ul class="issue-list">
           <li>
             <span class="issue-severity sev-active">Active</span>
             <span class="issue-text">
-              <strong>Installer requires active internet connection</strong>
-              The installation backend fetches packages and keyring updates live.
-              Offline install is not yet supported.
-            </span>
-          </li>
-          <li>
-            <span class="issue-severity sev-active">Active</span>
-            <span class="issue-text">
-              <strong>Mirror sync failures on some networks</strong>
-              Slow or restricted connections may cause archinstall to timeout
-              during package mirror selection. A retry usually resolves it.
+              <strong>Wi-Fi may not reconnect reliably after sleep on some Broadcom chipsets</strong>
+              The driver-reload workaround succeeds most of the time but not
+              always. A manual reconnect or reboot resolves it when it happens.
+              This is the top item we're tracking toward Beta 2.0.2.
             </span>
           </li>
           <li>
@@ -1524,6 +1767,46 @@
         </ul>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- Compatibility -->
+<section class="compatibility" id="compatibility">
+  <div class="section-inner">
+    <p class="section-label reveal">Check Before You Install</p>
+    <h2 class="section-title reveal">Compatibility varies by device.</h2>
+    <p class="section-body reveal">
+      SelahOS Beta 2.0.1 is being tested across selected Intel Macs and PC
+      hardware. Compatibility varies by model, GPU, Wi-Fi chipset, audio
+      interface, firmware, and peripheral configuration.
+    </p>
+
+    <div class="compat-grid">
+      <div class="compat-col reveal">
+        <h3>Verified hardware</h3>
+        <ul class="compat-list">
+          <li><strong>MacBook Pro 14,1 (2017, 13")</strong> — primary development machine, daily-driven.</li>
+          <li><strong>MacBook 10,1 (2017, 12")</strong> — boots and installs; Wi-Fi sleep/reconnect and speaker output are still being verified on this model.</li>
+        </ul>
+      </div>
+      <div class="compat-col reveal">
+        <h3>Not yet tested</h3>
+        <p class="compat-note">
+          Community testing welcome — please report results either way.
+        </p>
+        <ul class="compat-list compat-list-muted">
+          <li>MacBook Pro 9,2 (2012)</li>
+          <li>Other Intel Mac models not listed above</li>
+          <li>Generic PC/UEFI hardware</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="compat-notes reveal">
+      <p><strong>Install mode:</strong> UEFI required. Legacy BIOS boot is not supported.</p>
+      <p><strong>Wi-Fi/Bluetooth:</strong> Broadcom chipsets are supported; sleep/resume reconnect reliability is an active area of work (see Known Issues).</p>
+      <p><strong>Graphics:</strong> Intel and AMD GPUs use open-source drivers by default; NVIDIA falls back to Nouveau unless proprietary drivers are installed manually.</p>
     </div>
   </div>
 </section>
@@ -1644,23 +1927,44 @@
 <section class="access" id="access">
   <div class="section-inner">
     <p class="section-label reveal">Get Involved</p>
-    <h2 class="section-title reveal">Beta access is coming.</h2>
+    <h2 class="section-title reveal">Found a bug? Help us improve Beta 2.</h2>
 
     <div class="access-box reveal">
-      <h3>Request Early Access</h3>
+      <h3>Beta feedback</h3>
       <p>
-        SelahOS v1.0-beta is in active development. Direct
-        ISO downloads will be available once installer
-        stability reaches an acceptable threshold for
-        general testing.
+        SelahOS Beta 2.0.1 is being tested on a growing list of hardware.
+        Your reports — good or bad — directly shape what makes it into
+        Beta 2.0.2.
       </p>
       <a href="mailto:beta@selahos.io" class="btn-primary">
-        Request Early Access
+        Report a Bug
       </a>
       <p class="access-note">
         Currently testing on x86_64 hardware.<br>
         ARM support planned for V2.0.
       </p>
+    </div>
+  </div>
+</section>
+
+<!-- Campaign -->
+<section class="campaign">
+  <div class="section-inner">
+    <p class="section-label reveal">Still Called</p>
+    <div class="campaign-body reveal">
+      <p>Maybe the song waited.</p>
+      <p>Maybe the book waited.</p>
+      <p>Maybe the film waited.</p>
+      <p>Maybe the business waited.</p>
+      <p>Life moves. Responsibilities happen. Years pass.</p>
+      <p>But the calling does not always disappear.</p>
+      <p>
+        And sometimes the machine you already have is still capable of
+        helping you answer it.
+      </p>
+    </div>
+    <div class="campaign-cta reveal">
+      <a href="#download" class="btn-primary">Pause. Reflect. Create.</a>
     </div>
   </div>
 </section>
@@ -1687,7 +1991,7 @@
         <ul>
           <li><a href="#beta">Beta Status</a></li>
           <li><a href="#download">Download ISO</a></li>
-          <li><a href="#access">Request Access</a></li>
+          <li><a href="#access">Report a Bug</a></li>
         </ul>
       </div>
       <div class="footer-nav-col">
@@ -1708,6 +2012,11 @@
     </p>
     <p class="footer-legal">
       SelahOS™ and SelahBridge™ are trademarks of Selah Technologies LLC
+    </p>
+    <p class="footer-legal">
+      SelahOS and Selah Technologies are independent from Apple Inc.
+      Apple, Mac, MacBook, and macOS are trademarks of Apple Inc.
+      Other product names are trademarks of their respective owners.
     </p>
   </div>
 </footer>
