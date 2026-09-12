@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SelahOS Beta 2.0.1 is here — SelahOS Blog</title>
+<meta name="description" content="SelahOS Beta 2.0.1 is live: a real KDE Plasma 6 desktop, SelahBridge, a fully offline graphical installer, and an honest look at what's still open.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://selahos.io/blog/beta-2-0-1-launch.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://selahos.io/blog/beta-2-0-1-launch.html">
+<meta property="og:title" content="SelahOS Beta 2.0.1 is here">
+<meta property="og:description" content="Your machine still has work to do. SelahOS Beta 2.0.1 is live.">
+<meta property="og:image" content="https://selahos.io/og-image.png">
+<meta property="article:published_time" content="2026-09-09">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080C18;
+    --bg2:       #0D1220;
+    --bg3:       #131929;
+    --gold:      #C9974A;
+    --gold-lt:   #DEB96E;
+    --parch:     #EDE4D4;
+    --parch-dim: #B8AD9E;
+    --muted:     #6B6357;
+    --border:    #1E2535;
+    --teal:      #7DADA3;
+    --warn:      #BF7A3A;
+  }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--bg);
+    color: var(--parch);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.7;
+    padding-top: 62px;
+  }
+
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: rgba(8,12,24,0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .site-nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .site-nav-links a {
+    color: var(--parch-dim);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  .site-nav-links a:hover { color: var(--parch); }
+  .site-nav-links a.current { color: var(--gold); }
+  a:focus-visible { outline: 2px solid var(--gold-lt); outline-offset: 2px; }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 100px;
+  }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(30px, 5vw, 42px);
+    color: var(--parch);
+    margin-bottom: 12px;
+  }
+
+  .post-meta {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 24px;
+    color: var(--parch);
+    margin: 40px 0 12px;
+  }
+
+  p { color: var(--parch-dim); margin-bottom: 14px; font-size: 15.5px; }
+  strong { color: var(--parch); font-weight: 400; }
+  ul { color: var(--parch-dim); margin: 0 0 16px 22px; font-size: 15.5px; }
+  li { margin-bottom: 8px; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--gold-lt);
+    background: rgba(201,151,74,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+    word-break: break-all;
+  }
+
+  .callout {
+    padding: 18px 20px;
+    background: rgba(191,122,58,0.08);
+    border: 1px solid rgba(191,122,58,0.3);
+    border-left: 3px solid var(--warn);
+    border-radius: 4px;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 32px 0;
+  }
+  .btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 14px;
+    text-decoration: none;
+    border-radius: 3px;
+  }
+  .btn-primary { background: var(--gold); color: var(--bg); font-weight: 500; }
+  .btn-primary:hover { background: var(--gold-lt); }
+  .btn-secondary { background: transparent; color: var(--parch); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold-lt); }
+
+  .post-nav {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .post-nav a { color: var(--parch-dim); }
+
+  footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 56px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer a { color: var(--parch-dim); }
+
+  @media (max-width: 600px) {
+    main { padding: 40px 18px 80px; }
+    .site-nav { padding: 14px 18px; }
+    .site-nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="https://selahos.io" class="nav-logo">SelahOS</a>
+  <ul class="site-nav-links">
+    <li><a href="/beta2/">Beta 2.0.1</a></li>
+    <li><a href="https://selahos.io#compatibility">Compatibility</a></li>
+    <li><a href="/blog/" class="current">Blog</a></li>
+    <li><a href="/docs/">Docs</a></li>
+  </ul>
+</nav>
+
+<main>
+  <p class="kicker">Release</p>
+  <h1>SelahOS Beta 2.0.1 is here</h1>
+  <p class="post-meta">September 9, 2026 &middot; Selah Technologies LLC</p>
+
+  <p>
+    <strong>Your Mac may be unsupported. Your calling isn't.</strong>
+  </p>
+  <p>
+    SelahOS Beta 2.0.1 is our second public beta — a creator-first Linux
+    operating system built for musicians, producers, developers, and
+    makers who want capable hardware to stay useful longer. Beta 2.0.1
+    is a real beta, not a finished 1.0 release, and we'd rather tell you
+    exactly where it stands than oversell it.
+  </p>
+
+  <h2>What's in this build</h2>
+  <ul>
+    <li>ISO boots to a KDE Plasma 6 live desktop</li>
+    <li>SelahBridge — a Windows app compatibility layer</li>
+    <li>Full creator software stack (Ardour, Blender, GIMP, OBS, and more)</li>
+    <li>A custom SelahOS graphical installer that now works fully offline from a bundled package repository</li>
+    <li>PipeWire audio — low latency, JACK compatible</li>
+    <li>New: a per-machine hardware profile that's reapplied automatically at boot, so Wi-Fi and kernel settings are re-tuned correctly if a drive is moved to different hardware</li>
+  </ul>
+
+  <h2>What's still open</h2>
+  <p>
+    Wi-Fi may not reconnect reliably after sleep on some Broadcom
+    chipsets — this is the top item we're tracking toward Beta 2.0.2.
+    NVIDIA proprietary drivers aren't pre-installed (Nouveau is active by
+    default), Secure Boot must be disabled since we don't yet ship
+    signed bootloader keys, and Ventoy isn't supported for this image —
+    flash with <code>dd</code>.
+  </p>
+  <p>
+    Two specific hardware issues found during testing — Wi-Fi
+    association hangs on some Apple Broadcom cards, and a silent
+    internal speaker on some Cirrus CS4208 Macs — are documented in
+    detail, with workarounds, on our
+    <a href="/docs/known-issues.html">Known Issues &amp; Workarounds</a>
+    page.
+  </p>
+
+  <div class="callout">
+    <strong>What's next:</strong> Beta 2.0.2 is planned in roughly six
+    weeks (mid-to-late October 2026) and will fold in feedback and
+    testing data gathered during this Beta 2.0.1 window.
+  </div>
+
+  <h2>Verified so far</h2>
+  <p>
+    MacBook Pro 14,1 (2017, 13") is our primary development machine and
+    is daily-driven on SelahOS. MacBook 10,1 (2017, 12") and iMac16,2
+    (2015, 21.5") both boot and install, with the Wi-Fi/speaker issues
+    noted above. MacBook Pro 9,2 (2012), other Intel Mac models, and
+    generic PC/UEFI hardware are not yet tested — community testing is
+    welcome.
+  </p>
+
+  <div class="cta-row">
+    <a href="/beta2/" class="btn-primary">Get SelahOS Beta 2.0.1</a>
+    <a href="/docs/known-issues.html" class="btn-secondary">Known Issues</a>
+  </div>
+
+  <p>
+    Found a bug, or verified compatibility on a machine we haven't
+    listed? Email us at <a href="mailto:beta@selahos.io">beta@selahos.io</a>
+    — working or not, we want to hear about it.
+  </p>
+
+  <p>
+    SelahOS is an independent project and is not affiliated with or
+    endorsed by Apple Inc.
+  </p>
+
+  <div class="post-nav">
+    <a href="/blog/">&larr; Back to Blog &amp; Updates</a>
+  </div>
+</main>
+
+<footer>
+  <p>SelahOS™ is a trademark of Selah Technologies LLC. SelahOS and Selah
+  Technologies are independent from Apple Inc. — Apple, Mac, MacBook, and
+  macOS are trademarks of Apple Inc.</p>
+</footer>
+
+<script async src="/analytics/script.js" data-website-id="2ebc0e78-e572-47e9-94f9-9835c3779da7"></script>
+</body>
+</html>

@@ -344,6 +344,7 @@
     <li><a href="https://selahos.io#download">Download</a></li>
     <li><a href="https://selahos.io#founder">Vision</a></li>
     <li><a href="https://selahos.io#support">Support</a></li>
+    <li><a href="/blog/">Blog</a></li>
     <li><a href="/docs/" class="current">Docs</a></li>
   </ul>
   <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
@@ -361,6 +362,7 @@
     <li><a href="https://selahos.io#download">Download</a></li>
     <li><a href="https://selahos.io#founder">Vision</a></li>
     <li><a href="https://selahos.io#support">Support</a></li>
+    <li><a href="/blog/">Blog</a></li>
     <li><a href="/docs/">Docs</a></li>
   </ul>
 </div>
@@ -369,7 +371,7 @@
 <nav class="docs-nav">
   <div class="docs-nav-brand">
     <div class="wordmark">Documentation</div>
-    <div class="tagline">SelahOS v1.0-beta</div>
+    <div class="tagline">SelahOS Beta 2.0.1</div>
   </div>
 
   <div class="nav-section">Getting Started</div>
@@ -395,8 +397,8 @@
 
   <!-- ── OVERVIEW ── -->
   <div style='margin: 0 0 40px; padding: 24px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; border-left: 3px solid var(--gold);'>
-    <p style='font-family: Cormorant Garamond, serif; font-size: 20px; color: var(--gold); margin-bottom: 8px; font-weight: 400;'>Beta 1.0.1 Field Guide</p>
-    <p style='margin-bottom: 16px; font-size: 14px; color: var(--parch-dim);'>Complete installation and setup documentation for SelahOS Beta 1.0.1.</p>
+    <p style='font-family: Cormorant Garamond, serif; font-size: 20px; color: var(--gold); margin-bottom: 8px; font-weight: 400;'>Beta 2.0.1 Field Guide</p>
+    <p style='margin-bottom: 16px; font-size: 14px; color: var(--parch-dim);'>Complete installation and setup documentation for SelahOS Beta 2.0.1.</p>
     <a href="/docs/field-guide.html" style="display:inline-block;padding:10px 24px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:500;text-decoration:none;border-radius:3px;letter-spacing:0.05em;" download>Download Field Guide</a>
   </div>
   <section id="overview">
@@ -443,7 +445,7 @@
 
     <h3>Writing the ISO</h3>
     <p>Always use <code>dd</code> to write the ISO. Do <strong>not</strong> use Ventoy.</p>
-    <pre><code>sudo dd if=selahos-v1.0-beta-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
+    <pre><code>sudo dd if=SelahOS-Beta2.0.1-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
     <p>Replace <code>/dev/sdX</code> with your USB drive (check with <code>lsblk</code>).</p>
 
     <h3>Boot Menu</h3>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Source &amp; Repositories — SelahOS</title>
+<meta name="description" content="Where to find SelahOS's public source repositories on GitHub: the website and the ISO build profile.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://selahos.io/repo/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://selahos.io/repo/">
+<meta property="og:title" content="Source & Repositories — SelahOS">
+<meta property="og:description" content="Where to find SelahOS's public source repositories on GitHub.">
+<meta property="og:image" content="https://selahos.io/og-image.png">
+<meta property="og:site_name" content="SelahOS">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080C18;
+    --bg2:       #0D1220;
+    --bg3:       #131929;
+    --gold:      #C9974A;
+    --gold-lt:   #DEB96E;
+    --parch:     #EDE4D4;
+    --parch-dim: #B8AD9E;
+    --muted:     #6B6357;
+    --border:    #1E2535;
+    --teal:      #7DADA3;
+  }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--bg);
+    color: var(--parch);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.7;
+    padding-top: 62px;
+  }
+
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: rgba(8,12,24,0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .site-nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .site-nav-links a {
+    color: var(--parch-dim);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  .site-nav-links a:hover { color: var(--parch); }
+  .site-nav-links a.current { color: var(--gold); }
+  a:focus-visible { outline: 2px solid var(--gold-lt); outline-offset: 2px; }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px 24px 100px;
+  }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 5vw, 44px);
+    color: var(--parch);
+    margin-bottom: 16px;
+  }
+
+  .lead {
+    font-size: 16px;
+    color: var(--parch-dim);
+    max-width: 640px;
+    margin-bottom: 40px;
+  }
+
+  .repo-card {
+    display: block;
+    padding: 24px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .repo-card:hover { border-color: var(--gold); }
+  .repo-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--gold-lt);
+    margin-bottom: 6px;
+  }
+  .repo-desc { color: var(--parch-dim); font-size: 14.5px; margin-bottom: 0; }
+
+  .status-box {
+    padding: 20px 24px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    margin: 40px 0;
+    font-size: 14px;
+    color: var(--parch-dim);
+  }
+  .status-box strong { color: var(--parch); font-weight: 400; }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 24px;
+    color: var(--parch);
+    margin: 48px 0 12px;
+  }
+  p { color: var(--parch-dim); margin-bottom: 14px; font-size: 15px; }
+  strong { color: var(--parch); font-weight: 400; }
+
+  footer {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 32px 24px 56px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer a { color: var(--parch-dim); }
+
+  @media (max-width: 600px) {
+    main { padding: 40px 18px 80px; }
+    .site-nav { padding: 14px 18px; }
+    .site-nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="https://selahos.io" class="nav-logo">SelahOS</a>
+  <ul class="site-nav-links">
+    <li><a href="/beta2/">Beta 2.0.1</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/docs/">Docs</a></li>
+    <li><a href="/repo/" class="current">Source</a></li>
+  </ul>
+</nav>
+
+<main>
+  <p class="kicker">Selah Technologies</p>
+  <h1>Source &amp; repositories</h1>
+  <p class="lead">
+    SelahOS is built in public. Here's where the actual source lives —
+    the website you're reading right now, and the ISO build profile used
+    to assemble every SelahOS release.
+  </p>
+
+  <a class="repo-card" href="https://github.com/SelahOS/selahos" target="_blank" rel="noopener">
+    <p class="repo-name">github.com/SelahOS/selahos</p>
+    <p class="repo-desc">This website — the marketing site, download page, and documentation you're browsing now.</p>
+  </a>
+
+  <a class="repo-card" href="https://github.com/SelahOS/selahos-iso" target="_blank" rel="noopener">
+    <p class="repo-name">github.com/SelahOS/selahos-iso</p>
+    <p class="repo-desc">The SelahOS ISO build profile — the mkarchiso configuration, packages, and system customization used to build every release.</p>
+  </a>
+
+  <div class="status-box">
+    <strong>License status:</strong> Neither repository currently
+    carries a published license file. Until one is added, treat these
+    repositories as public for reference and transparency rather than as
+    formally open-source under a specific license. If you're interested
+    in contributing or reusing anything here, reach out first at
+    <a href="mailto:beta@selahos.io" style="color:var(--gold);">beta@selahos.io</a>.
+  </div>
+
+  <h2>Report a bug</h2>
+  <p>
+    Found something broken in Beta 2.0.1? Open an issue on the relevant
+    repository above, or email
+    <a href="mailto:beta@selahos.io">beta@selahos.io</a> with your
+    machine model and what you found.
+  </p>
+</main>
+
+<footer>
+  <p>SelahOS™ is a trademark of Selah Technologies LLC. SelahOS and Selah
+  Technologies are independent from Apple Inc. — Apple, Mac, MacBook, and
+  macOS are trademarks of Apple Inc.</p>
+</footer>
+
+<script async src="/analytics/script.js" data-website-id="2ebc0e78-e572-47e9-94f9-9835c3779da7"></script>
+</body>
+</html>
