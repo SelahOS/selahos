@@ -376,6 +376,45 @@ print(f"Wrote GPIO_DATA=0x{data:02x} via {dev}. Listen now.")</code></pre>
     </p>
   </details>
 
+  <h2>Wi-Fi doesn't connect on some 2012-era Macs <span class="badge">Active</span></h2>
+  <p>
+    On the 2012 MacBook Pro (non-Retina, MacBookPro9,2), Wi-Fi fails to
+    connect entirely — tried against multiple networks, including a
+    simple phone hotspot, so it isn't specific to any one router. This
+    model uses an older Broadcom chip (BCM4331) driven by a different,
+    proprietary driver than newer Macs — one the Linux kernel itself now
+    flags as unmaintained and incompatible with modern kernel security
+    protections. Realistically, this may not be fixable without new
+    driver work no one has done — it's not the same issue as the
+    calibration-data problem above.
+  </p>
+
+  <div class="workaround">
+    <h3>Workaround</h3>
+    <p>Use a wired Ethernet connection or a USB Wi-Fi adapter — same as
+    the workaround above, and equally reliable here.</p>
+  </div>
+
+  <h2>Internal speaker silent on the 2012 MacBook Pro <span class="badge">Active</span></h2>
+  <p>
+    Also on the 2012 MacBook Pro (non-Retina): the internal speaker
+    produces no sound. This is a <strong>different codec and a different
+    situation</strong> from the CS4208 issue above — this model uses an
+    older Cirrus CS4206 codec, and we verified the driver takes the
+    correct, long-established code path for it (not the CS4208-specific
+    one), with the amplifier-enable signal correctly asserted exactly as
+    intended. It's still silent regardless. This may mean this specific
+    board needs its own dedicated fix nobody has written yet, or it may
+    be a physical fault in an individual 12+ year old unit — genuinely
+    unclear which, and not something we can resolve without more units
+    to compare against.
+  </p>
+
+  <div class="workaround">
+    <h3>Workaround</h3>
+    <p>Use an external or USB audio device until this is resolved.</p>
+  </div>
+
   <h2>Have a fix, or found something new?</h2>
   <p>
     We'd genuinely rather hear from you than have you wait on our queue.
