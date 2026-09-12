@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contribute to SelahOS</title>
+<meta name="description" content="Interested in contributing to SelahOS — code, testing, documentation, design, or hardware work? Tell us about yourself.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://selahos.io/contribute/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://selahos.io/contribute/">
+<meta property="og:title" content="Contribute to SelahOS">
+<meta property="og:description" content="Interested in contributing to SelahOS? Tell us about yourself.">
+<meta property="og:image" content="https://selahos.io/og-image.png">
+<meta property="og:site_name" content="SelahOS">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080C18;
+    --bg2:       #0D1220;
+    --bg3:       #131929;
+    --gold:      #C9974A;
+    --gold-lt:   #DEB96E;
+    --parch:     #EDE4D4;
+    --parch-dim: #B8AD9E;
+    --muted:     #6B6357;
+    --border:    #1E2535;
+    --teal:      #7DADA3;
+    --warn:      #BF7A3A;
+    --err:       #C97A6B;
+  }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--bg);
+    color: var(--parch);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.7;
+    padding-top: 62px;
+  }
+
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: rgba(8,12,24,0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .site-nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .site-nav-links a {
+    color: var(--parch-dim);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  .site-nav-links a:hover { color: var(--parch); }
+  .site-nav-links a.current { color: var(--gold); }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--gold-lt);
+    outline-offset: 2px;
+  }
+
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 56px 24px 100px;
+  }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(30px, 5vw, 40px);
+    color: var(--parch);
+    margin-bottom: 16px;
+  }
+
+  .lead {
+    font-size: 16px;
+    color: var(--parch-dim);
+    margin-bottom: 20px;
+  }
+
+  .note {
+    padding: 16px 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    margin-bottom: 36px;
+    font-size: 13.5px;
+    color: var(--parch-dim);
+  }
+  .note strong { color: var(--parch); font-weight: 400; }
+
+  form { margin-top: 8px; }
+
+  .field { margin-bottom: 22px; }
+  label {
+    display: block;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    color: var(--parch-dim);
+    margin-bottom: 8px;
+  }
+  label .req { color: var(--gold); }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--parch);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  select { appearance: none; cursor: pointer; }
+
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  .consent-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .consent-row input[type="checkbox"] {
+    margin-top: 4px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+  }
+  .consent-row label {
+    margin-bottom: 0;
+    font-size: 13.5px;
+  }
+
+  /* Honeypot — hidden from sighted users and should stay empty for real submissions */
+  .hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  button[type="submit"] {
+    display: inline-block;
+    padding: 13px 32px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  button[type="submit"]:hover { background: var(--gold-lt); }
+  button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .form-status {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: none;
+  }
+  .form-status.show { display: block; }
+  .form-status.ok {
+    background: rgba(125,173,163,0.1);
+    border: 1px solid rgba(125,173,163,0.3);
+    color: var(--teal);
+  }
+  .form-status.err {
+    background: rgba(201,122,107,0.1);
+    border: 1px solid rgba(201,122,107,0.3);
+    color: var(--err);
+  }
+
+  footer {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 32px 24px 56px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer a { color: var(--parch-dim); }
+
+  @media (max-width: 600px) {
+    main { padding: 40px 18px 80px; }
+    .site-nav { padding: 14px 18px; }
+    .site-nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="https://selahos.io" class="nav-logo">SelahOS</a>
+  <ul class="site-nav-links">
+    <li><a href="/beta2/">Beta 2.0.1</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/repo/">Source</a></li>
+    <li><a href="/contribute/" class="current">Contribute</a></li>
+    <li><a href="/docs/">Docs</a></li>
+  </ul>
+</nav>
+
+<main>
+  <p class="kicker">Get Involved</p>
+  <h1>Contribute to SelahOS</h1>
+  <p class="lead">
+    SelahOS is built in public, and we're always glad to hear from people
+    who want to help — with code, hardware testing, documentation,
+    design, or just spreading the word.
+  </p>
+
+  <div class="note">
+    <strong>What happens with this form:</strong> we keep a record of
+    everyone who reaches out so we can follow up as the project grows —
+    including for potential paid roles down the line, if that's ever a
+    fit. We won't share your info outside Selah Technologies LLC, and we
+    won't spam you.
+  </div>
+
+  <form id="contribute-form" novalidate>
+    <div class="field hp-field" aria-hidden="true">
+      <label for="website">Leave this field empty</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="name">Name <span class="req">*</span></label>
+      <input type="text" id="name" name="name" required autocomplete="name" maxlength="200">
+    </div>
+
+    <div class="field">
+      <label for="email">Email <span class="req">*</span></label>
+      <input type="email" id="email" name="email" required autocomplete="email" maxlength="200">
+    </div>
+
+    <div class="field">
+      <label for="area">What would you like to help with? <span class="req">*</span></label>
+      <select id="area" name="area" required>
+        <option value="" disabled selected>Choose an area</option>
+        <option value="development">Development (installer, drivers, packaging)</option>
+        <option value="testing">Hardware testing</option>
+        <option value="documentation">Documentation</option>
+        <option value="design">Design / branding</option>
+        <option value="hardware">Hardware / driver expertise</option>
+        <option value="audio-music">Audio / music workflow</option>
+        <option value="community">Community / outreach</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="link">GitHub, portfolio, or LinkedIn link (optional)</label>
+      <input type="url" id="link" name="link" placeholder="https://" maxlength="500">
+    </div>
+
+    <div class="field">
+      <label for="message">Tell us about yourself <span class="req">*</span></label>
+      <textarea id="message" name="message" required maxlength="5000" placeholder="What's your background, and what draws you to SelahOS?"></textarea>
+    </div>
+
+    <div class="consent-row">
+      <input type="checkbox" id="consent" name="consent" required>
+      <label for="consent">I'm okay with Selah Technologies LLC keeping this information on file to consider me for future opportunities with SelahOS. <span class="req">*</span></label>
+    </div>
+
+    <button type="submit" id="submit-btn">Send</button>
+
+    <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+  </form>
+</main>
+
+<footer>
+  <p>SelahOS™ is a trademark of Selah Technologies LLC. Questions? Email
+  <a href="mailto:beta@selahos.io">beta@selahos.io</a>.</p>
+</footer>
+
+<script async src="/analytics/script.js" data-website-id="2ebc0e78-e572-47e9-94f9-9835c3779da7"></script>
+<script>
+  (function () {
+    var form = document.getElementById('contribute-form');
+    var status = document.getElementById('form-status');
+    var btn = document.getElementById('submit-btn');
+
+    function showStatus(kind, text) {
+      status.textContent = text;
+      status.className = 'form-status show ' + kind;
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      status.className = 'form-status';
+
+      var payload = {
+        website: document.getElementById('website').value,
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        area: document.getElementById('area').value,
+        link: document.getElementById('link').value.trim(),
+        message: document.getElementById('message').value.trim(),
+        consent: document.getElementById('consent').checked
+      };
+
+      if (!payload.name || !payload.email || !payload.area || !payload.message || !payload.consent) {
+        showStatus('err', 'Please fill in all required fields and confirm the checkbox.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      fetch('/api/contribute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          if (result.ok && result.data.ok) {
+            form.reset();
+            showStatus('ok', "Thanks — we've got your info and will be in touch if there's a fit.");
+          } else {
+            showStatus('err', (result.data && result.data.error) || 'Something went wrong. Please try again or email beta@selahos.io directly.');
+          }
+        })
+        .catch(function () {
+          showStatus('err', 'Something went wrong. Please try again or email beta@selahos.io directly.');
+        })
+        .finally(function () {
+          btn.disabled = false;
+          btn.textContent = 'Send';
+        });
+    });
+  })();
+</script>
+
+</body>
+</html>

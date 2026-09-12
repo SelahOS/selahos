@@ -1,0 +1,20 @@
+[Unit]
+Description=SelahOS Contribute form backend
+After=network.target
+
+[Service]
+Type=simple
+User=dane
+WorkingDirectory=/home/dane/apps/selah-contribute
+ExecStart=/home/dane/apps/selah-contribute/venv/bin/python3 /home/dane/apps/selah-contribute/app.py
+Restart=on-failure
+RestartSec=3
+
+# Hardening — this service only needs to read/write its own directory
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/dane/apps/selah-contribute
+
+[Install]
+WantedBy=multi-user.target
