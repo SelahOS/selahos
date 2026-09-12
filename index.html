@@ -1734,10 +1734,19 @@
           <li>
             <span class="issue-severity sev-active">Active</span>
             <span class="issue-text">
-              <strong>Wi-Fi may not reconnect reliably after sleep on some Broadcom chipsets</strong>
-              The driver-reload workaround succeeds most of the time but not
-              always. A manual reconnect or reboot resolves it when it happens.
-              This is the top item we're tracking toward Beta 2.0.2.
+              <strong>Wi-Fi may hang or not reconnect reliably on some Apple Broadcom chipsets</strong>
+              Affects first-time connection on some models, not just
+              post-sleep reconnect. Workaround: use Ethernet or a USB Wi-Fi
+              adapter for now. <a href="/docs/known-issues.html" style="color:var(--gold);">Full detail &amp; a script to try &rarr;</a>
+            </span>
+          </li>
+          <li>
+            <span class="issue-severity sev-active">Active</span>
+            <span class="issue-text">
+              <strong>Internal speaker silent on some Cirrus CS4208 Macs</strong>
+              Confirmed on MacBook 10,1 and iMac16,2. The headphone jack /
+              external audio works fine on the same hardware.
+              <a href="/docs/known-issues.html" style="color:var(--gold);">Full detail &amp; workaround &rarr;</a>
             </span>
           </li>
           <li>
@@ -1787,7 +1796,8 @@
         <h3>Verified hardware</h3>
         <ul class="compat-list">
           <li><strong>MacBook Pro 14,1 (2017, 13")</strong> — primary development machine, daily-driven.</li>
-          <li><strong>MacBook 10,1 (2017, 12")</strong> — boots and installs; Wi-Fi sleep/reconnect and speaker output are still being verified on this model.</li>
+          <li><strong>MacBook 10,1 (2017, 12")</strong> — boots and installs; Wi-Fi and internal speaker have known issues, see <a href="/docs/known-issues.html" style="color:var(--gold);">Known Issues</a>.</li>
+          <li><strong>iMac16,2 (2015, 21.5")</strong> — boots and installs; Wi-Fi and internal speaker have known issues, see <a href="/docs/known-issues.html" style="color:var(--gold);">Known Issues</a>.</li>
         </ul>
       </div>
       <div class="compat-col reveal">
@@ -1805,7 +1815,7 @@
 
     <div class="compat-notes reveal">
       <p><strong>Install mode:</strong> UEFI required. Legacy BIOS boot is not supported.</p>
-      <p><strong>Wi-Fi/Bluetooth:</strong> Broadcom chipsets are supported; sleep/resume reconnect reliability is an active area of work (see Known Issues).</p>
+      <p><strong>Wi-Fi/Bluetooth:</strong> Broadcom chipsets are supported; some models may hang on first connection or after sleep — see <a href="/docs/known-issues.html" style="color:var(--gold);">Known Issues &amp; Workarounds</a>.</p>
       <p><strong>Graphics:</strong> Intel and AMD GPUs use open-source drivers by default; NVIDIA falls back to Nouveau unless proprietary drivers are installed manually.</p>
     </div>
   </div>
