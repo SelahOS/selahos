@@ -6,14 +6,14 @@
   <link rel="apple-touch-icon" href="/favicon.svg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contribute to SelahOS</title>
-<meta name="description" content="Interested in contributing to SelahOS — code, testing, documentation, design, or hardware work? Tell us about yourself.">
+<title>SelahBridgePro License</title>
+<meta name="description" content="Get a SelahBridgePro license — run your Windows DAWs and plugins on SelahOS. Beta pricing available for early testers.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://selahos.io/contribute/">
+<link rel="canonical" href="https://selahos.io/selahbridgepro/">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://selahos.io/contribute/">
-<meta property="og:title" content="Contribute to SelahOS">
-<meta property="og:description" content="Interested in contributing to SelahOS? Tell us about yourself.">
+<meta property="og:url" content="https://selahos.io/selahbridgepro/">
+<meta property="og:title" content="SelahBridgePro License">
+<meta property="og:description" content="Run your Windows DAWs and plugins on SelahOS. Beta pricing available for early testers.">
 <meta property="og:image" content="https://selahos.io/og-image.png">
 <meta property="og:site_name" content="SelahOS">
 
@@ -91,7 +91,7 @@
   }
   .site-nav-links a:hover { color: var(--parch); }
   .site-nav-links a.current { color: var(--gold); }
-  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  a:focus-visible, button:focus-visible, input:focus-visible {
     outline: 2px solid var(--gold-lt);
     outline-offset: 2px;
   }
@@ -121,24 +121,53 @@
   .lead {
     font-size: 16px;
     color: var(--parch-dim);
-    margin-bottom: 20px;
+    margin-bottom: 32px;
   }
 
-  .note {
-    padding: 16px 20px;
+  .price-card {
     background: var(--bg3);
     border: 1px solid var(--border);
-    border-left: 3px solid var(--teal);
-    border-radius: 4px;
-    margin-bottom: 36px;
-    font-size: 13.5px;
-    color: var(--parch-dim);
+    border-radius: 8px;
+    padding: 28px 28px 24px;
+    margin-bottom: 32px;
   }
-  .note strong { color: var(--parch); font-weight: 400; }
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .price-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    color: var(--gold-lt);
+  }
+  .price-period { font-size: 14px; color: var(--parch-dim); }
+  .price-strike {
+    font-size: 15px;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+  .price-note { font-size: 13.5px; color: var(--parch-dim); margin-top: 10px; }
+  .price-note strong { color: var(--parch); font-weight: 400; }
+
+  ul.features { margin: 20px 0 0 0; list-style: none; }
+  ul.features li {
+    padding-left: 22px;
+    position: relative;
+    font-size: 14.5px;
+    color: var(--parch-dim);
+    margin-bottom: 10px;
+  }
+  ul.features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+  }
 
   form { margin-top: 8px; }
-
-  .field { margin-bottom: 22px; }
+  .field { margin-bottom: 18px; }
   label {
     display: block;
     font-size: 13px;
@@ -146,16 +175,20 @@
     color: var(--parch-dim);
     margin-bottom: 8px;
   }
-  label .req { color: var(--gold); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .hint code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--gold-lt);
+    background: rgba(201,151,74,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="url"],
-  select,
-  textarea {
+  input[type="text"], input[type="email"] {
     width: 100%;
     padding: 12px 14px;
-    background: var(--bg3);
+    background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 4px;
     color: var(--parch);
@@ -163,42 +196,13 @@
     font-size: 15px;
     font-weight: 300;
   }
-  textarea { resize: vertical; min-height: 120px; }
-  select { appearance: none; cursor: pointer; }
-
-  input::placeholder, textarea::placeholder { color: var(--muted); }
-
-  .consent-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-  .consent-row input[type="checkbox"] {
-    margin-top: 4px;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--gold);
-    flex-shrink: 0;
-  }
-  .consent-row label {
-    margin-bottom: 0;
-    font-size: 13.5px;
-  }
-
-  /* Honeypot — hidden from sighted users and should stay empty for real submissions */
-  .hp-field {
-    position: absolute;
-    left: -9999px;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-  }
+  input::placeholder { color: var(--muted); }
 
   button[type="submit"] {
-    display: inline-block;
-    padding: 13px 32px;
-    font-size: 14px;
+    display: block;
+    width: 100%;
+    padding: 14px 28px;
+    font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.4px;
     background: var(--gold);
@@ -207,27 +211,30 @@
     border-radius: 3px;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
   }
   button[type="submit"]:hover { background: var(--gold-lt); }
   button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .form-status {
-    margin-top: 20px;
+    margin-top: 18px;
     padding: 14px 18px;
     border-radius: 4px;
     font-size: 14px;
     display: none;
   }
   .form-status.show { display: block; }
-  .form-status.ok {
-    background: rgba(125,173,163,0.1);
-    border: 1px solid rgba(125,173,163,0.3);
-    color: var(--teal);
-  }
   .form-status.err {
     background: rgba(201,122,107,0.1);
     border: 1px solid rgba(201,122,107,0.3);
     color: var(--err);
+  }
+
+  .secure-note {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 16px;
   }
 
   footer {
@@ -254,97 +261,74 @@
   <ul class="site-nav-links">
     <li><a href="/beta2/">Beta 2.0.1</a></li>
     <li><a href="/blog/">Blog</a></li>
-    <li><a href="/repo/">Source</a></li>
-    <li><a href="/contribute/" class="current">Contribute</a></li>
-    <li><a href="/selahbridgepro/">SelahBridgePro</a></li>
+    <li><a href="/selahbridgepro/" class="current">SelahBridgePro</a></li>
     <li><a href="/docs/">Docs</a></li>
   </ul>
 </nav>
 
 <main>
-  <p class="kicker">Get Involved</p>
-  <h1>Contribute to SelahOS</h1>
+  <p class="kicker">SelahBridgePro</p>
+  <h1>Run your Windows DAWs and plugins on SelahOS.</h1>
   <p class="lead">
-    SelahOS is built in public, and we're always glad to hear from people
-    who want to help — with code, hardware testing, documentation,
-    design, or just spreading the word.
+    SelahBridgePro is our compatibility layer for Windows music software —
+    DAWs, plugin managers, and hardware companion apps — running natively
+    on SelahOS.
   </p>
 
-  <div class="note">
-    <strong>What happens with this form:</strong> we keep a record of
-    everyone who reaches out so we can follow up as the project grows —
-    including for potential paid roles down the line, if that's ever a
-    fit. We won't share your info outside Selah Technologies LLC, and we
-    won't spam you.
+  <div class="price-card">
+    <div class="price-row">
+      <span class="price-amount" id="display-price">$29.95</span>
+      <span class="price-period">first year</span>
+    </div>
+    <p class="price-note">
+      <strong>Early/beta tester pricing.</strong> Renews at $69.99/year
+      after your first year — cancel anytime.
+    </p>
+    <ul class="features">
+      <li>One license per machine</li>
+      <li>Covers all SelahBridgePro updates during your subscription</li>
+      <li>Priority support during the beta window</li>
+    </ul>
   </div>
 
-  <form id="contribute-form" novalidate>
-    <div class="field hp-field" aria-hidden="true">
-      <label for="website">Leave this field empty</label>
-      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+  <form id="checkout-form" novalidate>
+    <div class="field">
+      <label for="machine_id">Your Machine ID</label>
+      <input type="text" id="machine_id" name="machine_id" required maxlength="32" placeholder="32-character hex string">
+      <p class="hint">Run <code>selahpro --machine-id</code> in a terminal on the machine you'll use SelahBridgePro on.</p>
     </div>
 
     <div class="field">
-      <label for="name">Name <span class="req">*</span></label>
-      <input type="text" id="name" name="name" required autocomplete="name" maxlength="200">
-    </div>
-
-    <div class="field">
-      <label for="email">Email <span class="req">*</span></label>
+      <label for="email">Email</label>
       <input type="email" id="email" name="email" required autocomplete="email" maxlength="200">
     </div>
 
     <div class="field">
-      <label for="area">What would you like to help with? <span class="req">*</span></label>
-      <select id="area" name="area" required>
-        <option value="" disabled selected>Choose an area</option>
-        <option value="development">Development (installer, drivers, packaging)</option>
-        <option value="testing">Hardware testing</option>
-        <option value="documentation">Documentation</option>
-        <option value="design">Design / branding</option>
-        <option value="hardware">Hardware / driver expertise</option>
-        <option value="audio-music">Audio / music workflow</option>
-        <option value="community">Community / outreach</option>
-        <option value="other">Other</option>
-      </select>
+      <label for="promo_code">Beta tester code (optional)</label>
+      <input type="text" id="promo_code" name="promo_code" maxlength="50" placeholder="e.g. BETAYEAR1">
     </div>
 
-    <div class="field">
-      <label for="link">GitHub, portfolio, or LinkedIn link (optional)</label>
-      <input type="url" id="link" name="link" placeholder="https://" maxlength="500">
-    </div>
-
-    <div class="field">
-      <label for="message">Tell us about yourself <span class="req">*</span></label>
-      <textarea id="message" name="message" required maxlength="5000" placeholder="What's your background, and what draws you to SelahOS?"></textarea>
-    </div>
-
-    <div class="consent-row">
-      <input type="checkbox" id="consent" name="consent" required>
-      <label for="consent">I'm okay with Selah Technologies LLC keeping this information on file to consider me for future opportunities with SelahOS. <span class="req">*</span></label>
-    </div>
-
-    <button type="submit" id="submit-btn">Send</button>
+    <button type="submit" id="submit-btn">Continue to Payment</button>
+    <p class="secure-note">Payment is handled securely by Stripe. We never see or store your card details.</p>
 
     <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
   </form>
 </main>
 
 <footer>
-  <p>SelahOS™ is a trademark of Selah Technologies LLC. Questions? Email
-  <a href="mailto:beta@selahos.io">beta@selahos.io</a>.</p>
+  <p>SelahOS™ and SelahBridge™ are trademarks of Selah Technologies LLC.</p>
 </footer>
 
 <script async src="/analytics/script.js" data-website-id="2ebc0e78-e572-47e9-94f9-9835c3779da7"></script>
 <script>
   (function () {
-    var form = document.getElementById('contribute-form');
+    var form = document.getElementById('checkout-form');
     var status = document.getElementById('form-status');
     var btn = document.getElementById('submit-btn');
 
-    function showStatus(kind, text) {
+    function showError(text) {
       status.textContent = text;
-      status.className = 'form-status show ' + kind;
+      status.className = 'form-status show err';
     }
 
     form.addEventListener('submit', function (e) {
@@ -352,43 +336,38 @@
       status.className = 'form-status';
 
       var payload = {
-        website: document.getElementById('website').value,
-        name: document.getElementById('name').value.trim(),
+        machine_id: document.getElementById('machine_id').value.trim().toLowerCase(),
         email: document.getElementById('email').value.trim(),
-        area: document.getElementById('area').value,
-        link: document.getElementById('link').value.trim(),
-        message: document.getElementById('message').value.trim(),
-        consent: document.getElementById('consent').checked
+        promo_code: document.getElementById('promo_code').value.trim()
       };
 
-      if (!payload.name || !payload.email || !payload.area || !payload.message || !payload.consent) {
-        showStatus('err', 'Please fill in all required fields and confirm the checkbox.');
+      if (!/^[0-9a-f]{32}$/.test(payload.machine_id)) {
+        showError('Machine ID should be a 32-character hex string, from `selahpro --machine-id`.');
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Sending…';
+      btn.textContent = 'Redirecting to payment…';
 
-      fetch('/api/contribute', {
+      fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
         .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
         .then(function (result) {
-          if (result.ok && result.data.ok) {
-            form.reset();
-            showStatus('ok', "Thanks — we've got your info and will be in touch if there's a fit.");
+          if (result.ok && result.data.ok && result.data.checkout_url) {
+            window.location.href = result.data.checkout_url;
           } else {
-            showStatus('err', (result.data && result.data.error) || 'Something went wrong. Please try again or email beta@selahos.io directly.');
+            showError((result.data && result.data.error) || 'Something went wrong. Please try again.');
+            btn.disabled = false;
+            btn.textContent = 'Continue to Payment';
           }
         })
         .catch(function () {
-          showStatus('err', 'Something went wrong. Please try again or email beta@selahos.io directly.');
-        })
-        .finally(function () {
+          showError('Something went wrong. Please try again or email beta@selahos.io.');
           btn.disabled = false;
-          btn.textContent = 'Send';
+          btn.textContent = 'Continue to Payment';
         });
     });
   })();
