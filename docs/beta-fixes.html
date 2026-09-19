@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beta 2.0.1 Fix Script — SelahOS Docs</title>
+<meta name="description" content="A one-shot script that fixes known installer problems on already-installed SelahOS Beta 2.0.1 systems: pacman updates, Wi-Fi driver auto-loading, missing regulatory database and realtime audio support.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080C18;
+    --bg2:       #0D1220;
+    --bg3:       #131929;
+    --gold:      #C9974A;
+    --gold-lt:   #DEB96E;
+    --parch:     #EDE4D4;
+    --parch-dim: #B8AD9E;
+    --muted:     #6B6357;
+    --border:    #1E2535;
+    --teal:      #7DADA3;
+    --red:       #BF7A3A;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--parch);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+    padding-top: 62px;
+  }
+
+  /* ── Site Nav ── */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: rgba(8,12,24,0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .site-nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .site-nav-links a {
+    color: var(--parch-dim);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  .site-nav-links a:hover { color: var(--parch); }
+  .site-nav-links a.current { color: var(--gold); }
+
+  /* ── Hamburger ── */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 40px; height: 40px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 18px; height: 1px;
+    background: var(--parch-dim);
+    transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+    transform-origin: center;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* ── Mobile overlay ── */
+  .mobile-menu {
+    position: fixed; top: 62px; left: 0; right: 0; bottom: 0; z-index: 199;
+    background: rgba(8,12,24,0.98);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    overflow-y: auto;
+    padding: 40px 0 40px;
+    backdrop-filter: blur(16px);
+    visibility: hidden; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+  .mobile-menu.open { visibility: visible; opacity: 1; pointer-events: auto; }
+  .mobile-menu-links { list-style: none; text-align: center; }
+  .mobile-menu-links li { border-bottom: 1px solid var(--border); }
+  .mobile-menu-links li:first-child { border-top: 1px solid var(--border); }
+  .mobile-menu-links a {
+    display: block;
+    padding: 22px 48px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--parch-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s, background 0.2s;
+  }
+  .mobile-menu-links a:hover { color: var(--gold); background: rgba(201,151,74,0.04); }
+
+  /* ── Docs Sidebar ── */
+  .docs-nav {
+    position: fixed;
+    top: 62px; left: 0;
+    width: 260px;
+    height: calc(100vh - 62px);
+    background: var(--bg3);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 32px 0 40px;
+    display: flex;
+    flex-direction: column;
+    z-index: 90;
+  }
+  .docs-nav-brand {
+    padding: 0 28px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .docs-nav-brand .wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .docs-nav-brand .tagline {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    opacity: 0.7;
+  }
+  .nav-section {
+    padding: 6px 28px 2px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+  .docs-nav a {
+    display: block;
+    padding: 7px 28px;
+    color: var(--parch-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 300;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .docs-nav a:hover { color: var(--parch); border-left-color: var(--border); }
+  .docs-nav a.active { color: var(--gold); border-left-color: var(--gold); }
+
+  /* ── Main ── */
+  main {
+    margin-left: 260px;
+    flex: 1;
+    max-width: 900px;
+    padding: 60px 64px 100px;
+  }
+
+  /* ── Headings ── */
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px;
+    font-weight: 300;
+    color: var(--gold);
+    margin-bottom: 12px;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+  }
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--gold);
+    margin: 52px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.01em;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--parch);
+    margin: 28px 0 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  p { margin-bottom: 16px; color: var(--parch-dim); font-weight: 300; }
+  p strong { color: var(--parch); font-weight: 500; }
+  .lead { font-size: 17px; color: var(--muted); margin-bottom: 32px; line-height: 1.8; }
+
+  /* ── Code ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--bg2);
+    color: var(--teal);
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 16px 0 24px;
+  }
+  pre code {
+    background: none; border: none; padding: 0;
+    font-size: 12px;
+    color: var(--parch-dim);
+    line-height: 1.7;
+  }
+
+  /* ── Callouts ── */
+  .callout {
+    border-left: 2px solid var(--gold);
+    background: rgba(201,151,74,0.04);
+    border-radius: 0 4px 4px 0;
+    padding: 14px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .callout.warn { border-left-color: var(--red); background: rgba(191,122,58,0.05); }
+  .callout.tip  { border-left-color: var(--teal); background: rgba(125,173,163,0.05); }
+  .callout strong { color: var(--gold); font-weight: 500; }
+  .callout.warn strong { color: var(--red); }
+  .callout.tip  strong { color: var(--teal); }
+
+  /* ── Lists ── */
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; color: var(--parch-dim); }
+
+  /* ── Section anchors ── */
+  section { padding-top: 8px; }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer a { color: var(--teal); text-decoration: none; }
+  main section a { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .site-nav { padding: 16px 24px; }
+    .site-nav-links { gap: 16px; }
+  }
+  @media (max-width: 700px) {
+    .site-nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    body { flex-direction: column; }
+    .docs-nav { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); top: 0; }
+    main { margin-left: 0; padding: 32px 24px 60px; }
+  }
+</style>
+<script async src=/analytics/script.js data-website-id=2ebc0e78-e572-47e9-94f9-9835c3779da7></script>
+</head>
+<body>
+
+<!-- ── Site nav ── -->
+<nav class="site-nav">
+  <a href="https://selahos.io" class="nav-logo">SelahOS</a>
+  <ul class="site-nav-links">
+    <li><a href="https://selahos.io#why">Philosophy</a></li>
+    <li><a href="https://selahos.io#pillars">Pillars</a></li>
+    <li><a href="https://selahos.io#screenshots">Screenshots</a></li>
+    <li><a href="https://selahos.io#beta">Beta</a></li>
+    <li><a href="https://selahos.io#download">Download</a></li>
+    <li><a href="https://selahos.io#founder">Vision</a></li>
+    <li><a href="https://selahos.io#support">Support</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/contribute/">Contribute</a></li>
+    <li><a href="/selahbridgepro/">SelahBridgePro</a></li>
+    <li><a href="/docs/" class="current">Docs</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── Mobile menu ── -->
+<div class="mobile-menu" aria-hidden="true">
+  <ul class="mobile-menu-links">
+    <li><a href="https://selahos.io#why">Philosophy</a></li>
+    <li><a href="https://selahos.io#pillars">Pillars</a></li>
+    <li><a href="https://selahos.io#screenshots">Screenshots</a></li>
+    <li><a href="https://selahos.io#beta">Beta</a></li>
+    <li><a href="https://selahos.io#download">Download</a></li>
+    <li><a href="https://selahos.io#founder">Vision</a></li>
+    <li><a href="https://selahos.io#support">Support</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/contribute/">Contribute</a></li>
+    <li><a href="/selahbridgepro/">SelahBridgePro</a></li>
+    <li><a href="/docs/">Docs</a></li>
+  </ul>
+</div>
+
+<!-- ── Docs sidebar ── -->
+<nav class="docs-nav">
+  <div class="docs-nav-brand">
+    <div class="wordmark">Documentation</div>
+    <div class="tagline">SelahOS Beta 2.0.1</div>
+  </div>
+
+  <div class="nav-section">Getting Started</div>
+  <a href="/docs/#overview">Overview</a>
+  <a href="/docs/#requirements">System Requirements</a>
+  <a href="/docs/#boot">Live Boot</a>
+  <a href="/docs/#install">Installation</a>
+
+  <div class="nav-section">SelahBridge</div>
+  <a href="/docs/#selahbridge">What Is SelahBridge?</a>
+  <a href="/docs/#sb-install">Installing SelahBridge</a>
+  <a href="/docs/#sb-manager">Compatible Apps</a>
+  <a href="/docs/#sb-audio">Audio Support</a>
+  <a href="/docs/#sb-apps">Hardware &amp; Support</a>
+
+  <div class="nav-section">System</div>
+  <a href="/docs/#recovery">Recovery Tools</a>
+  <a href="/docs/#update">Updating SelahOS</a>
+  <a href="/docs/#faq">FAQ</a>
+  <a href="/docs/extras.html">Extras &amp; Fixes</a>
+  <a href="/docs/beta-fixes.html" class="current">Beta Fix Script</a>
+
+  <div class="nav-section">Beta Fix Script</div>
+  <a href="#what">What it fixes</a>
+  <a href="#run">How to run it</a>
+  <a href="#safety">Safety &amp; backups</a>
+  <a href="#notfixed">Not covered here</a>
+</nav>
+
+<main>
+
+  <section id="top">
+    <h1>Beta 2.0.1 Fix Script</h1>
+    <p class="lead">Installer problems found by our first outside beta tester,
+    already fixed for the next ISO. This script applies the same fixes to a
+    system you have <em>already installed</em> from the Beta 2.0.1 ISO, so you
+    don't have to reinstall.</p>
+    <div class="callout warn">
+      <strong>New and lightly tested.</strong> Run it with <code>--check</code>
+      first (it changes nothing), read what it reports, then apply. It needs
+      root to apply and backs up every file it touches. If anything looks wrong,
+      tell us at <a href="mailto:beta@selahos.io">beta@selahos.io</a>.
+    </div>
+  </section>
+
+  <section id="what">
+    <h2>What it fixes</h2>
+
+    <h3>1. <code>pacman -Sy</code> fails on a fresh install</h3>
+    <p>The installer copied two repositories into your installed
+    <code>/etc/pacman.conf</code> that cannot work there: <code>[selahos-offline]</code>
+    points at a folder that only exists on the live USB, and <code>[chaotic-aur]</code>
+    has no signing key on your system. Pacman aborts the whole sync if any one
+    repository fails, so updates and installs break until both are removed.
+    The script disables both (they are only needed to build the live ISO).</p>
+
+    <h3>2. Broadcom <code>wl</code> driver loads on non-Broadcom Wi-Fi</h3>
+    <p>The <code>wl</code> driver matches any Wi-Fi card by PCI class, so on Intel,
+    Atheros and other laptops it loaded anyway, tainted the kernel and printed
+    a warning at boot. On machines with <strong>no Broadcom Wi-Fi chip</strong>
+    the script blacklists it. On machines that do have one, it leaves your
+    Wi-Fi driver configuration completely alone.</p>
+
+    <h3>3. Missing packages</h3>
+    <ul>
+      <li><code>wireless-regdb</code> &mdash; the regulatory database; without it Wi-Fi
+      runs on the restrictive default region (no proper 6&nbsp;GHz on Wi-Fi 6E).</li>
+      <li><code>rtkit</code> and <code>realtime-privileges</code> &mdash; realtime scheduling
+      for PipeWire, which audio work needs.</li>
+      <li><code>ksystemlog</code> and <code>discover</code> &mdash; a log viewer and a
+      software centre (Flathub is already configured).</li>
+    </ul>
+  </section>
+
+  <section id="run">
+    <h2>How to run it</h2>
+    <p>Download and confirm the checksum matches before running anything as root:</p>
+    <pre><code>cd ~/Downloads
+curl -fLO https://selahos.io/docs/downloads/selah-beta-fix-2026-09-19.sh
+sha256sum selah-beta-fix-2026-09-19.sh</code></pre>
+    <p>The checksum must be exactly:</p>
+    <pre><code>592bbc46308544d06c402872f9f3b85e3131a4d434a090a5e97d4869a1767fc3</code></pre>
+    <p>Then look first, apply second, and reboot:</p>
+    <pre><code>sudo bash selah-beta-fix-2026-09-19.sh --check   # report only, changes nothing
+sudo bash selah-beta-fix-2026-09-19.sh           # apply the fixes
+reboot</code></pre>
+    <p>It is safe to run twice; anything already fixed is reported as
+    <code>[ok]</code>. You can read the source first on
+    <a href="https://github.com/SelahOS/selahos-iso/blob/main/tools/beta-fixes/selah-beta-fix-2026-09-19.sh">GitHub</a>.
+    Installing the packages needs a working network connection.</p>
+  </section>
+
+  <section id="safety">
+    <h2>Safety &amp; backups</h2>
+    <ul>
+      <li>Every file the script modifies is first copied to
+      <code>/var/backups/selah-beta-fix/</code> with a timestamp.</li>
+      <li><code>--check</code> never modifies anything and does not need root.</li>
+      <li>It only touches <code>/etc/pacman.conf</code>, one file in
+      <code>/etc/modprobe.d/</code>, and installs the packages listed above.</li>
+    </ul>
+    <p>To undo the pacman change, copy the backed-up
+    <code>pacman.conf.*</code> file back over <code>/etc/pacman.conf</code>.</p>
+  </section>
+
+  <section id="notfixed">
+    <h2>Not covered by the script</h2>
+    <p>These installer fixes go into the next ISO and can't be applied afterwards:
+    carrying your keyboard layout and saved Wi-Fi network over from the live
+    session (set them in System Settings for now), and the Selah Repair
+    window staying open after it finishes. See also the
+    <a href="/docs/known-issues.html">Known Issues</a> page and the
+    <a href="/docs/extras.html">Extras &amp; Fixes</a> worksheet.</p>
+    <div class="callout tip">
+      <strong>Installing in a VM?</strong> The installer requires UEFI. In
+      virt-manager choose <em>UEFI (OVMF)</em> firmware instead of the default
+      BIOS; Secure Boot must stay off.
+    </div>
+  </section>
+
+  <footer>
+    <p>SelahOS &copy; 2026 Selah Technologies LLC &mdash; Dane-Brandon Noble, founder.</p>
+    <p style="margin-top:8px">
+      Have a fix, or found something new? Email
+      <a href="mailto:beta@selahos.io">beta@selahos.io</a>.
+    </p>
+  </footer>
+
+</main>
+
+<script>
+  // Hamburger toggle
+  const hamburger = document.querySelector('.nav-hamburger');
+  const mobileMenu = document.querySelector('.mobile-menu');
+  hamburger.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
+    mobileMenu.classList.toggle('open');
+    mobileMenu.setAttribute('aria-hidden', !open);
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', false);
+      mobileMenu.setAttribute('aria-hidden', true);
+    });
+  });
+
+  // Scroll-spy on docs sidebar (within-page anchors only)
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.docs-nav a[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.docs-nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
