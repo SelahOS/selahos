@@ -403,11 +403,18 @@
 
     <h3>1. <code>pacman -Sy</code> fails on a fresh install</h3>
     <p>The installer copied two repositories into your installed
-    <code>/etc/pacman.conf</code> that cannot work there: <code>[selahos-offline]</code>
-    points at a folder that only exists on the live USB, and <code>[chaotic-aur]</code>
-    has no signing key on your system. Pacman aborts the whole sync if any one
-    repository fails, so updates and installs break until both are removed.
-    The script disables both (they are only needed to build the live ISO).</p>
+    <code>/etc/pacman.conf</code> that don't belong on an installed system:</p>
+    <ul>
+      <li><code>[selahos-offline]</code> points at a folder that only exists on the live
+      USB. Pacman fails on it immediately with
+      <code>Could not open file /usr/local/share/selahos-offline-repo/selahos-offline.db</code>
+      and <code>failed to synchronize all databases</code>. We reproduced this on our own
+      development machine.</li>
+      <li><code>[chaotic-aur]</code> is a third-party repository that was only needed to
+      build the live ISO, and its mirrors have had outages that stop updates.</li>
+    </ul>
+    <p>Pacman aborts the whole sync if any one repository fails, so updates and installs
+    break until they are removed. The script disables both.</p>
 
     <h3>2. Broadcom <code>wl</code> driver loads on non-Broadcom Wi-Fi</h3>
     <p>The <code>wl</code> driver matches any Wi-Fi card by PCI class, so on Intel,
