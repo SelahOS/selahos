@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SelahOS Documentation</title>
-<meta name="description" content="SelahOS documentation — installation, SelahBridge, recovery tools, and FAQ.">
+<title>Extras &amp; Fixes Worksheet — SelahOS Docs</title>
+<meta name="description" content="Creator apps that don't ship in the base SelahOS install, and the exact commands for real issues found and fixed across the project — Wine/SelahBridge, system health tools, and more.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -227,14 +230,6 @@
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
-  h4 {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--teal);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin: 20px 0 8px;
-  }
 
   p { margin-bottom: 16px; color: var(--parch-dim); font-weight: 300; }
   p strong { color: var(--parch); font-weight: 500; }
@@ -280,22 +275,6 @@
   .callout.warn strong { color: var(--red); }
   .callout.tip  strong { color: var(--teal); }
 
-  /* ── Tables ── */
-  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13px; }
-  th {
-    background: var(--bg3);
-    color: var(--gold-lt);
-    font-weight: 500;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: left;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--parch-dim); }
-  tr:hover td { background: var(--bg3); }
-
   /* ── Lists ── */
   ul, ol { padding-left: 24px; margin-bottom: 16px; }
   li { margin-bottom: 6px; color: var(--parch-dim); }
@@ -312,6 +291,7 @@
     color: var(--muted);
   }
   footer a { color: var(--teal); text-decoration: none; }
+  main section a { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
 
   /* ── Responsive ── */
   @media (max-width: 900px) {
@@ -376,247 +356,131 @@
   </div>
 
   <div class="nav-section">Getting Started</div>
-  <a href="#overview">Overview</a>
-  <a href="#requirements">System Requirements</a>
-  <a href="#boot">Live Boot</a>
-  <a href="#install">Installation</a>
+  <a href="/docs/#overview">Overview</a>
+  <a href="/docs/#requirements">System Requirements</a>
+  <a href="/docs/#boot">Live Boot</a>
+  <a href="/docs/#install">Installation</a>
 
   <div class="nav-section">SelahBridge</div>
-  <a href="#selahbridge">What Is SelahBridge?</a>
-  <a href="#sb-install">Installing SelahBridge</a>
-  <a href="#sb-manager">Compatible Apps</a>
-  <a href="#sb-audio">Audio Support</a>
-  <a href="#sb-apps">Hardware &amp; Support</a>
+  <a href="/docs/#selahbridge">What Is SelahBridge?</a>
+  <a href="/docs/#sb-install">Installing SelahBridge</a>
+  <a href="/docs/#sb-manager">Compatible Apps</a>
+  <a href="/docs/#sb-audio">Audio Support</a>
+  <a href="/docs/#sb-apps">Hardware &amp; Support</a>
 
   <div class="nav-section">System</div>
-  <a href="#recovery">Recovery Tools</a>
-  <a href="#update">Updating SelahOS</a>
-  <a href="#faq">FAQ</a>
-  <a href="/docs/extras.html">Extras &amp; Fixes</a>
+  <a href="/docs/#recovery">Recovery Tools</a>
+  <a href="/docs/#update">Updating SelahOS</a>
+  <a href="/docs/#faq">FAQ</a>
+  <a href="/docs/extras.html" class="current">Extras &amp; Fixes</a>
   <a href="/docs/beta-fixes.html">Beta Fix Script</a>
+
+  <div class="nav-section">Extras &amp; Fixes</div>
+  <a href="#apps">Creator Apps</a>
+  <a href="#wine">Wine / SelahBridge</a>
+  <a href="#health">System Health Tools</a>
+  <a href="#hardware">Known Hardware Issues</a>
 </nav>
 
 <main>
 
-  <!-- ── OVERVIEW ── -->
-  <div style='margin: 0 0 40px; padding: 24px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; border-left: 3px solid var(--gold);'>
-    <p style='font-family: Cormorant Garamond, serif; font-size: 20px; color: var(--gold); margin-bottom: 8px; font-weight: 400;'>Beta 2.0.1 Field Guide</p>
-    <p style='margin-bottom: 16px; font-size: 14px; color: var(--parch-dim);'>Complete installation and setup documentation for SelahOS Beta 2.0.1.</p>
-    <a href="https://raw.githubusercontent.com/SelahOS/selahos/main/docs/field-guide.html" style="display:inline-block;padding:10px 24px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:500;text-decoration:none;border-radius:3px;letter-spacing:0.05em;" download>Download Field Guide</a>
-  </div>
-  <section id="overview">
-    <h1>SelahOS Documentation</h1>
-    <p class="lead">SelahOS is a creator-first Arch Linux distribution built for musicians,
-    producers, and digital artists who demand low-latency audio and a polished desktop
-    without the complexity of a vanilla Arch install.</p>
-
-    <table>
-      <tr><th>Component</th><th>Choice</th></tr>
-      <tr><td>Base</td><td>Arch Linux</td></tr>
-      <tr><td>Kernel</td><td>linux-zen (low-latency optimized)</td></tr>
-      <tr><td>Desktop</td><td>KDE Plasma 6</td></tr>
-      <tr><td>Audio</td><td>PipeWire + WirePlumber (JACK-compatible)</td></tr>
-      <tr><td>Windows compatibility</td><td>SelahBridge (proprietary)</td></tr>
-      <tr><td>Theme</td><td>Selah (dark gold — Kvantum + Plasma)</td></tr>
-    </table>
+  <section id="apps-top">
+    <h1>Extras &amp; Fixes Worksheet</h1>
+    <p class="lead">Creator apps that don't ship in the base install, and the exact
+    commands for real issues found and root-caused across the project — nothing
+    here is speculative.</p>
   </section>
 
-  <!-- ── REQUIREMENTS ── -->
-  <section id="requirements">
-    <h2>System Requirements</h2>
+  <!-- ── CREATOR APPS ── -->
+  <section id="apps">
+    <h2>Creator Apps</h2>
+    <p>Ardour, Blender, GIMP, and OBS ship in the live ISO for the boot
+    environment, but are deliberately left out of the base install —
+    <code>selah-setup</code> uses a separate, lean package manifest. They're
+    meant to come from Flathub instead:</p>
+    <pre><code>flatpak install flathub org.ardour.Ardour org.blender.Blender org.gimp.GIMP com.obsproject.Studio</code></pre>
 
-    <h3>Minimum</h3>
-    <table>
-      <tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr>
-      <tr><td>CPU</td><td>x86_64, 2 cores</td><td>4+ cores, Intel/AMD 2018+</td></tr>
-      <tr><td>RAM</td><td>4 GB</td><td>16 GB</td></tr>
-      <tr><td>Storage</td><td>20 GB</td><td>60 GB SSD</td></tr>
-      <tr><td>GPU</td><td>Any with KMS</td><td>Vulkan-capable (recommended)</td></tr>
-      <tr><td>Audio</td><td>Any ALSA device</td><td>USB/PCIe audio interface</td></tr>
-      <tr><td>Boot</td><td>UEFI or BIOS</td><td>UEFI</td></tr>
-    </table>
+    <h3>No GUI software center by default</h3>
+    <p>The <code>flathub</code> remote is pre-configured, but Discover (the GUI
+    app store) isn't installed by default:</p>
+    <pre><code>sudo pacman -S discover</code></pre>
+  </section>
 
+  <!-- ── WINE / SELAHBRIDGE ── -->
+  <section id="wine">
+    <h2>Wine / SelahBridge</h2>
+
+    <h3>Wine/SelahBridge missing after "Installation finished"</h3>
+    <p>A known silent-failure mode: pacstrap can time out on
+    <code>wine-staging</code>/<code>wine-gecko</code> and the installer doesn't
+    hard-fail — it just reports no errors. Always verify directly:</p>
+    <pre><code>pacman -Q wine-staging || sudo pacman -S wine-staging winetricks wine-mono wine-gecko python-pyqt6 python-mido python-rtmidi</code></pre>
+
+    <h3>"wine client error: version mismatch" on launch</h3>
+    <p>A stale <code>wineserver</code> survives a Wine package upgrade and
+    rejects every new launch against that prefix:</p>
+    <pre><code>WINEPREFIX=~/.wine wineserver -k</code></pre>
+
+    <h3>Sign-in/activation opens real Firefox, never returns to the app</h3>
+    <p>The correct hook is a per-prefix registry key, not a <code>$BROWSER</code>
+    env var (confirmed not read by Wine at all). This is now baked into new
+    installs' defaults — for an existing prefix, apply it directly:</p>
+    <pre><code>WINEPREFIX=~/.wine wine reg add "HKCU\Software\Wine\WineBrowser" /v Browsers /d selahauth /f</code></pre>
+
+    <h3>Verify SelahBridge works end-to-end</h3>
+    <p>Runs a real throwaway-prefix test: Wine init, file write, registry
+    write, and the Windows audio API.</p>
+    <pre><code>selah-bridgepro-selftest</code></pre>
+
+    <h3>An app's UI is a black or white screen on launch</h3>
     <div class="callout warn">
-      <strong>Note:</strong> SelahBridge requires a Vulkan-capable GPU for full compatibility. Intel HD 4000+,
-      AMD GCN 1.0+, and NVIDIA Kepler+ are supported.
+      <strong>Known limit:</strong> apps using WebView2/CEF/Electron for their
+      UI need Direct2D 1.3, which Wine/DXVK/VKD3D don't implement yet — no
+      current workaround. Check first:
     </div>
+    <pre><code>strings /path/to/app.exe | grep -i -E 'CoreWebView2|EdgeWebView'</code></pre>
   </section>
 
-  <!-- ── LIVE BOOT ── -->
-  <section id="boot">
-    <h2>Live Boot</h2>
+  <!-- ── SYSTEM HEALTH ── -->
+  <section id="health">
+    <h2>System Health Tools</h2>
 
-    <h3>Writing the ISO</h3>
-    <p>Always use <code>dd</code> to write the ISO. Do <strong>not</strong> use Ventoy.</p>
-    <pre><code>sudo dd if=selahos-2.0.1-beta-2026.09.09-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
-    <p>Replace <code>/dev/sdX</code> with your USB drive (check with <code>lsblk</code>).</p>
+    <h3>General health check after any install or update</h3>
+    <pre><code>sudo selah-postflight-check</code></pre>
 
-    <h3>Boot Menu</h3>
-    <p>At the GRUB boot menu, select <strong>SelahOS Live</strong>. The system will boot
-    directly to the KDE desktop as <code>liveuser</code> with no password required.</p>
+    <h3>Repair a broken install (bootloader, partitions, etc.)</h3>
+    <pre><code>sudo selah-doctor</code></pre>
+    <p>Or, from a SelahOS USB booted on the broken machine —
+    <code>selah-repair</code> can heal an installed system it's not currently
+    running from.</p>
+
+    <h3>Reapply the correct hardware profile</h3>
+    <p>After moving a drive to different hardware:</p>
+    <pre><code>sudo selah-seedcore-reapply</code></pre>
+  </section>
+
+  <!-- ── KNOWN HARDWARE ISSUES ── -->
+  <section id="hardware">
+    <h2>Known Hardware Issues</h2>
+    <p>Wi-Fi association hangs on some Apple Broadcom cards, and internal
+    speaker silence on some Cirrus-codec Macs, are both real open issues with
+    workarounds and diagnostic scripts — tracked in full detail, kept current,
+    on the dedicated page rather than duplicated here:</p>
+    <p><a href="/docs/known-issues.html">→ Beta 2.0.1 Known Issues &amp; Workarounds</a></p>
 
     <div class="callout tip">
-      <strong>MacBook users:</strong> Hold <kbd>Option</kbd> at startup to select the USB drive.
-      GRUB is installed with <code>--removable</code> support for MacBook NVRAM compatibility.
+      <strong>Writing the ISO / UEFI:</strong> always use <code>dd</code>, not
+      Ventoy (see <a href="/docs/#boot">Live Boot</a>). UEFI is required —
+      legacy BIOS boot isn't supported — and Secure Boot must be disabled in
+      firmware, since SelahOS doesn't ship signed bootloader keys yet.
     </div>
-
-    <h3>Trying Before Installing</h3>
-    <p>The live environment is fully functional — you can browse the internet, test audio,
-    and explore SelahBridge before committing to an install. All changes are lost on reboot
-    unless you run the installer.</p>
-  </section>
-
-  <!-- ── INSTALLATION ── -->
-  <section id="install">
-    <h2>Installation</h2>
-
-    <p>Launch the installer from the desktop shortcut or application menu:
-    <strong>System → Install SelahOS</strong>.</p>
-
-    <h3>Steps</h3>
-    <ol>
-      <li>Select your target drive from the dropdown.</li>
-      <li>Choose your timezone and locale.</li>
-      <li>Set your username and password.</li>
-      <li>Review the partition layout (auto-partitioned by default).</li>
-      <li>Click <strong>Install</strong>.</li>
-    </ol>
-
-    <div class="callout warn">
-      <strong>Warning:</strong> Installation will erase the selected drive. Back up your data first.
-    </div>
-
-    <h3>Post-Install First Boot</h3>
-    <p>After installation completes and you reboot, SelahOS will apply your theme, configure
-    PipeWire, and run first-boot detection. This takes about 30 seconds and happens automatically.</p>
-  </section>
-
-  <!-- ── SELAHBRIDGE ── -->
-  <section id="selahbridge">
-    <h2>What Is SelahBridge?</h2>
-    <p>SelahBridge is SelahOS's proprietary Windows application compatibility layer. It enables professional Windows creative software — including DAWs and music production tools — to run natively on SelahOS with full audio support.</p>
-    <p>SelahBridge is exclusively available on SelahOS and is not available as a standalone product.</p>
-  </section>
-
-  <!-- ── SB INSTALL ── -->
-  <section id="sb-install">
-    <h2>Installing SelahBridge</h2>
-
-    <h3>Via the GUI</h3>
-    <ol>
-      <li>Open <strong>SelahBridge Setup</strong> from the application launcher.</li>
-      <li>The setup wizard will guide you through installation.</li>
-      <li>Log out and back in when prompted.</li>
-    </ol>
-
-    <h3>Via the Console</h3>
-    <pre><code>curl -fsSL https://raw.githubusercontent.com/SelahOS/selahos/main/selahbridge-install.sh | sudo bash</code></pre>
-  </section>
-
-  <!-- ── SB MANAGER ── -->
-  <section id="sb-manager">
-    <h2>Confirmed Working Applications</h2>
-    <ul>
-      <li>InMusic Software Center ✓</li>
-      <li>Additional creative applications in testing</li>
-    </ul>
-  </section>
-
-  <!-- ── SB AUDIO ── -->
-  <section id="sb-audio">
-    <h2>Audio Support</h2>
-    <p>SelahBridge includes full professional audio routing support. ASIO-compatible applications are supported through SelahBridge's integrated audio bridge.</p>
-  </section>
-
-  <!-- ── RUNNING APPS ── -->
-  <section id="sb-apps">
-    <h2>Hardware Compatibility</h2>
-    <p>Tested on MacBookPro9,2 &middot; MacBookPro14,1 &middot; iMac16,2</p>
-    <p>All Apple Intel Macs from 2009&ndash;2020 supported.</p>
-
-    <h2>Support</h2>
-    <p>For SelahBridge support visit <a href="https://selahos.io">selahos.io</a> or email
-    <a href="mailto:support@selahos.io">support@selahos.io</a></p>
-  </section>
-
-  <!-- ── RECOVERY ── -->
-  <section id="recovery">
-    <h2>Recovery Tools</h2>
-
-    <p>SelahOS includes several recovery tools accessible from the live environment
-    and from the installed system.</p>
-
-    <h3>selah-rescue</h3>
-    <p>Mounts the installed system and drops into a chroot for manual repair:</p>
-    <pre><code>sudo selah-rescue</code></pre>
-
-    <h3>selah-recover</h3>
-    <p>GUI recovery center — available in the Application Menu under System.
-    Offers options to reinstall the bootloader, reset the pacman keyring,
-    and repair broken packages.</p>
-
-    <h3>selah-update</h3>
-    <p>Safe system updater that handles keyring refresh, mirror ranking, and
-    pacman hooks in the correct order:</p>
-    <pre><code>selah-update</code></pre>
-
-    <h3>Bootloader Recovery (MacBook)</h3>
-    <p>If the system fails to boot on a MacBook after an NVRAM reset, boot from
-    the SelahOS USB, run <code>selah-rescue</code>, then:</p>
-    <pre><code>grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable</code></pre>
-  </section>
-
-  <!-- ── UPDATE ── -->
-  <section id="update">
-    <h2>Updating SelahOS</h2>
-    <p>SelahOS is a rolling release based on Arch Linux. To update:</p>
-    <pre><code>selah-update</code></pre>
-    <p>This runs a full system update with pre-flight keyring and mirror
-    checks. Run it periodically — at least once a month — to keep packages current.</p>
-
-    <div class="callout warn">
-      <strong>Before major updates:</strong> Create a SelahBridge snapshot in the SelahBridge Manager so you can roll back if something breaks.
-    </div>
-  </section>
-
-  <!-- ── FAQ ── -->
-  <section id="faq">
-    <h2>FAQ</h2>
-
-    <h3>No audio in my DAW after reboot</h3>
-    <p>Open SelahBridge Manager → Audio → <strong>Restart Audio Engine</strong>.
-    If the problem persists, use the audio registration option from the same tab.</p>
-
-    <h3>A Windows app won't launch</h3>
-    <p>Restore a snapshot from SelahBridge Manager → Snapshots, or contact
-    <a href="mailto:support@selahos.io">support@selahos.io</a> for assistance.</p>
-
-    <h3>SelahBridge Setup fails or stalls</h3>
-    <p>This usually means a network resource is temporarily unavailable. Wait a few minutes
-    and retry. If the issue persists, contact <a href="mailto:support@selahos.io">support@selahos.io</a>.</p>
-
-    <h3>DAW reports no audio device found</h3>
-    <p>Open SelahBridge Manager → Audio and use the audio registration option,
-    then restart the DAW.</p>
-
-    <h3>System is slow / high CPU after install</h3>
-    <p>Check that the <code>linux-zen</code> kernel is running:</p>
-    <pre><code>uname -r   # should contain "zen"</code></pre>
-    <p>If not, run <code>selah-update</code> and reboot.</p>
-
-    <h3>SDDM login screen doesn't appear</h3>
-    <p>Boot to TTY (Ctrl+Alt+F2), log in, and run:</p>
-    <pre><code>sudo systemctl enable --now sddm</code></pre>
-
-    <h3>Black screen after GRUB on MacBook</h3>
-    <p>Add <code>nomodeset</code> temporarily at the GRUB prompt.
-    Then boot, install the correct GPU driver, and remove it.</p>
   </section>
 
   <footer>
     <p>SelahOS &copy; 2026 Selah Technologies LLC &mdash; Dane-Brandon Noble, founder.</p>
     <p style="margin-top:8px">
-      Built on Arch Linux &middot; linux-zen kernel &middot; KDE Plasma 6 &middot; PipeWire
+      Have a fix, or found something new? Email
+      <a href="mailto:beta@selahos.io">beta@selahos.io</a>.
     </p>
   </footer>
 
@@ -641,9 +505,9 @@
     });
   });
 
-  // Scroll-spy on docs sidebar
+  // Scroll-spy on docs sidebar (within-page anchors only)
   const sections = document.querySelectorAll('section[id]');
-  const links = document.querySelectorAll('.docs-nav a');
+  const links = document.querySelectorAll('.docs-nav a[href^="#"]');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
