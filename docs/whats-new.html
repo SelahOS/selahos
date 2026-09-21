@@ -6,8 +6,8 @@
   <link rel="apple-touch-icon" href="/favicon.svg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beta 2.0.1 Fix Script — SelahOS Docs</title>
-<meta name="description" content="A one-shot script that fixes known installer problems on already-installed SelahOS Beta 2.0.1 systems: pacman updates, Wi-Fi driver auto-loading, missing regulatory database and realtime audio support.">
+<title>What&rsquo;s New — SelahOS Docs</title>
+<meta name="description" content="What has changed since the SelahOS Beta 2.0.1 download: what you can add to an existing install today, and what is coming in Beta 2.0.1.1.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -373,120 +373,75 @@
   <a href="/docs/#update">Updating SelahOS</a>
   <a href="/docs/#faq">FAQ</a>
   <a href="/docs/extras.html">Extras &amp; Fixes</a>
-  <a href="/docs/beta-fixes.html" class="current">Beta Fix Script</a>
+  <a href="/docs/beta-fixes.html">Beta Fix Script</a>
   <a href="/docs/print-center.html">Print Center</a>
-  <a href="/docs/whats-new.html">What&rsquo;s New</a>
+  <a href="/docs/whats-new.html" class="current">What&rsquo;s New</a>
 
-  <div class="nav-section">Beta Fix Script</div>
-  <a href="#what">What it fixes</a>
-  <a href="#run">How to run it</a>
-  <a href="#safety">Safety &amp; backups</a>
-  <a href="#notfixed">Not covered here</a>
+  <div class="nav-section">What&rsquo;s New</div>
+  <a href="#now">Available now</a>
+  <a href="#next">Coming in 2.0.1.1</a>
+  <a href="#open">Still open</a>
 </nav>
 
 <main>
 
   <section id="top">
-    <h1>Beta 2.0.1 Fix Script</h1>
-    <p class="lead">Installer problems found by our first outside beta tester,
-    already fixed for the next ISO. This script applies the same fixes to a
-    system you have <em>already installed</em> from the Beta 2.0.1 ISO, so you
-    don't have to reinstall.</p>
+    <h1>What&rsquo;s New</h1>
+    <p class="lead">Changes since the Beta 2.0.1 download of 9 September 2026. <strong>The download is still
+    2.0.1.</strong> Some of what&rsquo;s below you can add to a system you have already installed, today.
+    The rest arrives in the next ISO, <strong>Beta 2.0.1.1</strong>, which is <strong>not released yet</strong>.</p>
     <div class="callout warn">
-      <strong>New and lightly tested.</strong> Run it with <code>--check</code>
-      first (it changes nothing), read what it reports, then apply. It needs
-      root to apply and backs up every file it touches. If anything looks wrong,
-      tell us at <a href="mailto:beta@selahos.io">beta@selahos.io</a>.
+      <strong>Until 2.0.1.1 is released,</strong> the requirements on the download page still apply
+      (UEFI firmware; see <a href="/docs/known-issues.html">Known Issues</a>).
     </div>
   </section>
 
-  <section id="what">
-    <h2>What it fixes</h2>
-
-    <h3>1. <code>pacman -Sy</code> fails on a fresh install</h3>
-    <p>The installer copied two repositories into your installed
-    <code>/etc/pacman.conf</code> that don't belong on an installed system:</p>
+  <section id="now">
+    <h2>Available now, for an existing install</h2>
     <ul>
-      <li><code>[selahos-offline]</code> points at a folder that only exists on the live
-      USB. Pacman fails on it immediately with
-      <code>Could not open file /usr/local/share/selahos-offline-repo/selahos-offline.db</code>
-      and <code>failed to synchronize all databases</code>. We reproduced this on our own
-      development machine.</li>
-      <li><code>[chaotic-aur]</code> is a third-party repository that was only needed to
-      build the live ISO, and its mirrors have had outages that stop updates.</li>
-    </ul>
-    <p>Pacman aborts the whole sync if any one repository fails, so updates and installs
-    break until they are removed. The script disables both.</p>
-
-    <h3>2. Broadcom <code>wl</code> driver loads on non-Broadcom Wi-Fi</h3>
-    <p>The <code>wl</code> driver matches any Wi-Fi card by PCI class, so on Intel,
-    Atheros and other laptops it loaded anyway, tainted the kernel and printed
-    a warning at boot. On machines with <strong>no Broadcom Wi-Fi chip</strong>
-    the script blacklists it. On machines that do have one, it leaves your
-    Wi-Fi driver configuration completely alone.</p>
-
-    <h3>3. Missing packages</h3>
-    <ul>
-      <li><code>wireless-regdb</code> &mdash; the regulatory database; without it Wi-Fi
-      runs on the restrictive default region (no proper 6&nbsp;GHz on Wi-Fi 6E).</li>
-      <li><code>rtkit</code> and <code>realtime-privileges</code> &mdash; realtime scheduling
-      for PipeWire, which audio work needs.</li>
-      <li><code>ksystemlog</code> and <code>discover</code> &mdash; a log viewer and a
-      software centre (Flathub is already configured).</li>
+      <li><strong><a href="/docs/print-center.html">Print Center</a></strong> &mdash; finds printers on your network,
+      sets most of them up with no driver, and shows them in every app&rsquo;s Print dialog. One script adds it to a
+      system you have already installed. Revision 2 is current.</li>
+      <li><strong><a href="/docs/beta-fixes.html">Beta Fix Script</a></strong> &mdash; fixes for install problems
+      found by our first outside tester.</li>
     </ul>
   </section>
 
-  <section id="run">
-    <h2>How to run it</h2>
-    <p>Download and confirm the checksum matches before running anything as root:</p>
-    <pre><code>cd ~/Downloads
-curl -fLO https://selahos.io/docs/downloads/selah-beta-fix-2026-09-19.sh
-sha256sum selah-beta-fix-2026-09-19.sh</code></pre>
-    <p>The checksum must be exactly:</p>
-    <pre><code>592bbc46308544d06c402872f9f3b85e3131a4d434a090a5e97d4869a1767fc3</code></pre>
-    <p>Then look first, apply second, and reboot:</p>
-    <pre><code>sudo bash selah-beta-fix-2026-09-19.sh --check   # report only, changes nothing
-sudo bash selah-beta-fix-2026-09-19.sh           # apply the fixes
-reboot</code></pre>
-    <p>It is safe to run twice; anything already fixed is reported as
-    <code>[ok]</code>. You can read the source first on
-    <a href="https://github.com/SelahOS/selahos-iso/blob/main/tools/beta-fixes/selah-beta-fix-2026-09-19.sh">GitHub</a>.
-    Installing the packages needs a working network connection.</p>
-  </section>
-
-  <section id="safety">
-    <h2>Safety &amp; backups</h2>
+  <section id="next">
+    <h2>Coming in Beta 2.0.1.1 (not released yet)</h2>
+    <p>2.0.1.1 is a fix revision of 2.0.1. Everything below is finished in the source and has been tested
+    in virtual machines; it is <em>not</em> in the current download.</p>
     <ul>
-      <li>Every file the script modifies is first copied to
-      <code>/var/backups/selah-beta-fix/</code> with a timestamp.</li>
-      <li><code>--check</code> never modifies anything and does not need root.</li>
-      <li>It only touches <code>/etc/pacman.conf</code>, one file in
-      <code>/etc/modprobe.d/</code>, and installs the packages listed above.</li>
+      <li><strong>Install on computers that start in legacy BIOS mode.</strong> Beta 2.0.1 could finish
+      installing on such a machine and then not start, because it only set up UEFI booting. The installer now
+      detects how it was started and sets the drive up to match, and the same drive also starts on UEFI.
+      Tested in virtual machines with both BIOS and UEFI firmware; not yet on real BIOS-only hardware.</li>
+      <li><strong>A safer drive picker.</strong> It no longer lists things that can&rsquo;t be install targets
+      (floppy drives, compressed-RAM swap, read-only and tiny devices), and it no longer picks a drive for you
+      when more than one could be the target &mdash; you choose.</li>
+      <li><strong>Hostname check.</strong> The installer rejects a computer name with characters that break
+      networking (for example an underscore).</li>
+      <li><strong>A system check on the welcome screen.</strong> It shows the boot mode, memory and network
+      status, with a note if something is worth knowing before you start (for example, low memory).</li>
+      <li><strong>Better recovery.</strong> The <code>selah-rescue</code> boot-repair tool now repairs both UEFI and
+      BIOS installs, checks that the repair worked, and looks for the boot partition on the same drive as the
+      system you chose.</li>
+      <li><strong>Print Center built in.</strong> Printer discovery and setup are part of the install, so
+      printers work without running a separate script.</li>
     </ul>
-    <p>To undo the pacman change, copy the backed-up
-    <code>pacman.conf.*</code> file back over <code>/etc/pacman.conf</code>.</p>
   </section>
 
-  <section id="notfixed">
-    <h2>Not covered by the script</h2>
-    <p>These installer fixes go into the next ISO and can't be applied afterwards:
-    carrying your keyboard layout and saved Wi-Fi network over from the live
-    session (set them in System Settings for now), and the Selah Repair
-    window staying open after it finishes. See also the
-    <a href="/docs/known-issues.html">Known Issues</a> page and the
-    <a href="/docs/extras.html">Extras &amp; Fixes</a> worksheet.</p>
-    <div class="callout tip">
-      <strong>Installing in a VM?</strong> The installer requires UEFI. In
-      virt-manager choose <em>UEFI (OVMF)</em> firmware instead of the default
-      BIOS; Secure Boot must stay off.
-    </div>
+  <section id="open">
+    <h2>Still open</h2>
+    <p>These are <strong>not</strong> fixed in 2.0.1.1: Wi-Fi that won&rsquo;t connect, and silent internal speakers,
+    on some Macs. They are being worked on with real hardware; see <a href="/docs/known-issues.html">Known Issues</a>
+    for what we know and any workaround.</p>
   </section>
 
   <footer>
     <p>SelahOS &copy; 2026 Selah Technologies LLC &mdash; Dane-Brandon Noble, founder.</p>
     <p style="margin-top:8px">
-      Have a fix, or found something new? Email
-      <a href="mailto:beta@selahos.io">beta@selahos.io</a>.
+      Questions, or something not working? Email <a href="mailto:beta@selahos.io">beta@selahos.io</a>.
     </p>
   </footer>
 

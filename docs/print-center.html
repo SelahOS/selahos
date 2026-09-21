@@ -375,6 +375,7 @@
   <a href="/docs/extras.html">Extras &amp; Fixes</a>
   <a href="/docs/beta-fixes.html">Beta Fix Script</a>
   <a href="/docs/print-center.html" class="current">Print Center</a>
+  <a href="/docs/whats-new.html">What&rsquo;s New</a>
 
   <div class="nav-section">Print Center</div>
   <a href="#what">What you get</a>
@@ -394,9 +395,10 @@
     configures itself. This script adds the Print Center to a system you have
     <em>already installed</em>; it will also be built into the next ISO.</p>
     <div class="callout warn">
-      <strong>New and lightly tested.</strong> We tested discovery, setup and a printed
-      page against one printer (a Brother HL-L3230CDW color laser). The installer script
-      itself is brand new. Run it with <code>--check</code> first, and tell us at
+      <strong>New, and tested on one printer.</strong> Discovery, setup and a printed
+      test page have been checked on two computers (one of them a machine installed from
+      Beta 2.0.1) against one printer, a Brother HL-L3230CDW color laser. Other printers
+      are untested. Run the script with <code>--check</code> first, and tell us at
       <a href="mailto:beta@selahos.io">beta@selahos.io</a> what printer you have and how it went.
     </div>
   </section>
@@ -422,15 +424,23 @@
     <h2>How to install it</h2>
     <p>Download it and confirm the checksum before running anything:</p>
     <pre><code>cd ~/Downloads
-curl -fLO https://selahos.io/docs/downloads/selahos-print-center-install-2026-09-21.sh
-sha256sum selahos-print-center-install-2026-09-21.sh</code></pre>
+curl -fLO https://selahos.io/docs/downloads/selahos-print-center-install-2026-09-21-r2.sh
+sha256sum selahos-print-center-install-2026-09-21-r2.sh</code></pre>
     <p>The checksum must be exactly:</p>
-    <pre><code>0e75267d4a73578e36c81f807ecee4b23c180cf45ac67571a1eab91bf47d8c6e</code></pre>
+    <pre><code>26df4c932030ca9114aa7cc0a3829dd3a895d95a559a5751050078956db31bd5</code></pre>
+    <div class="callout tip">
+      <strong>Revision 2 (this page).</strong> Fixes two things found on its first run on a
+      second computer: a setup step that could leave your admin account unable to add printers
+      (the script now repairs CUPS's admin-group setting), and the script no longer says
+      &ldquo;Done&rdquo; when its own final check reports a problem. <strong>If you already
+      ran the first version</strong> (its checksum began <code>0e75267d</code>), run this one over it &mdash;
+      that is safe.
+    </div>
     <p>Look first, install second. Run it as your normal user &mdash; it asks for your password once:</p>
-    <pre><code>bash selahos-print-center-install-2026-09-21.sh --check   # report only, changes nothing
-bash selahos-print-center-install-2026-09-21.sh           # install</code></pre>
+    <pre><code>bash selahos-print-center-install-2026-09-21-r2.sh --check   # report only, changes nothing
+bash selahos-print-center-install-2026-09-21-r2.sh           # install</code></pre>
     <p>It is safe to run twice. You can read everything it installs first:
-    <code>bash selahos-print-center-install-2026-09-21.sh --extract ~/print-center-source</code> unpacks the programs without installing them,
+    <code>bash selahos-print-center-install-2026-09-21-r2.sh --extract ~/print-center-source</code> unpacks the programs without installing them,
     or just open the script in a text editor &mdash; the program sources are at the bottom.
     Installing needs a working network connection.</p>
     <div class="callout tip">
@@ -460,9 +470,10 @@ bash selahos-print-center-install-2026-09-21.sh           # install</code></pre>
     <ul>
       <li>It installs two programs and a menu entry under <code>/usr/local/bin</code> and
       <code>/usr/share/applications</code>, plus the packages above.</li>
-      <li>It edits two system files &mdash; <code>/etc/nsswitch.conf</code> (so printers' <code>.local</code>
-      names resolve) and <code>/etc/cups/cups-browsed.conf</code> (so network printers are added automatically)
-      &mdash; and copies each to <code>/var/backups/selah-print/</code> first.</li>
+      <li>It edits up to three system files &mdash; <code>/etc/nsswitch.conf</code> (so printers' <code>.local</code>
+      names resolve), <code>/etc/cups/cups-browsed.conf</code> (so network printers are added automatically)
+      and, only if its admin-group line is missing, <code>/etc/cups/cups-files.conf</code> (so your admin account
+      can add printers) &mdash; and copies each to <code>/var/backups/selah-print/</code> first.</li>
       <li>It <strong>never modifies <code>/etc/pacman.conf</code></strong>; it uses a temporary copy without the
       <code>[selahos-offline]</code> and <code>[chaotic-aur]</code> sections that break installs on
       installed systems (see the <a href="/docs/beta-fixes.html">Beta Fix Script</a>).</li>
